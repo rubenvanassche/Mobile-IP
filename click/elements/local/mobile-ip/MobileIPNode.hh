@@ -4,6 +4,7 @@
 #include <click/element.hh>
 #include <iostream>
 #include "packets/PacketBuilders.hh"
+#include "packets/PacketProcessors.hh"
 
 CLICK_DECLS
 

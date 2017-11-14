@@ -12,6 +12,7 @@
 #include <iostream>
 
 CLICK_DECLS
+
 /**
  * Adds an ip and udp header to the packet
  */
@@ -24,12 +25,18 @@ WritablePacket* IPfy(
   unsigned int ttl
 );
 
+/**
+ * Adds an tunnel for an given IP packet, creates a new packet
+ */
 Packet* buildTunnelIPPacket(
     Packet* packet,
     IPAddress source,
     IPAddress destination
 );
 
+/**
+ * Builds an Mobile IP Registration request
+ */
 Packet* buildRegistrationRequestPacket(
     unsigned int lifetime,
     IPAddress home,
@@ -37,6 +44,9 @@ Packet* buildRegistrationRequestPacket(
     IPAddress careOf
 );
 
+/**
+ * Builds an Mobile IP Registration Reply
+ */
 Packet* buildRegistrationReplyPacket(
     unsigned int lifetime,
     uint8_t code,

@@ -94,7 +94,7 @@ Packet* buildRegistrationRequestPacket(
         IPAddress careOf
 ){
     int tailroom = 0;
-    int packetsize = sizeof(registrationRequest);
+    int packetsize = sizeof(registrationRequestPacket);
     int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
 
     WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
@@ -104,11 +104,11 @@ Packet* buildRegistrationRequestPacket(
     }
 
     memset(packet->data(), 0, packet->length());
-    registrationRequest* format = (registrationRequest*) packet->data();
+    registrationRequestPacket* format = (registrationRequestPacket*) packet->data();
 
     format->type = 1;
     format->S = 0;
-    format->B = 1;
+    format->B = 0;
     format->D = 0;
     format->M = 0;
     format->G = 0;
@@ -132,7 +132,7 @@ Packet* buildRegistrationReplyPacket(
         IPAddress homeAgent
 ){
   int tailroom = 0;
-  int packetsize = sizeof(registrationReply);
+  int packetsize = sizeof(registrationReplyPacket);
   int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
 
   WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
@@ -142,7 +142,7 @@ Packet* buildRegistrationReplyPacket(
   }
 
   memset(packet->data(), 0, packet->length());
-  registrationReply* format = (registrationReply*) packet->data();
+  registrationReplyPacket* format = (registrationReplyPacket*) packet->data();
 
   format->type = 3;
   format->code = code;

@@ -9,8 +9,9 @@ MobileIPNode::MobileIPNode() {
 MobileIPNode::~MobileIPNode() { };
 
 Packet *MobileIPNode::simple_action(Packet *p) {
-	// TODO: fill
-	std::cout << this->noutputs() << std::endl;
+	tunnelIP r = processTunnelIPPacket(p, true);
+	std::cout << "cc" << r.ttl << std::endl;
+
 
 	return p;
 };

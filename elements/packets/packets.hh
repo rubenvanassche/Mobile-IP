@@ -3,7 +3,7 @@
 
 #include <clicknet/ip.h>
 
-struct registrationRequest{
+struct registrationRequestPacket{
   uint8_t type; // Should be 1
   unsigned int x : 1; // should be 0
   unsigned int T : 1; // do not use : 0
@@ -21,7 +21,7 @@ struct registrationRequest{
   uint32_t identification2 = 0x0; // Ignored
 };
 
-struct registrationReply{
+struct registrationReplyPacket{
   uint8_t type; // should be 3
   uint8_t code; // result of registration request
   uint16_t lifetime; // see page 36

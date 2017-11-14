@@ -5,6 +5,7 @@
 #include <iostream>
 #include "packets/packets.hh"
 #include "packets/PacketBuilders.hh"
+#include "packets/PacketProcessors.hh"
 
 CLICK_DECLS
 
