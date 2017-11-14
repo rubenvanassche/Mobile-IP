@@ -71,4 +71,3 @@ icmp :: ICMPPingSource(corresponding_node_address, mobile_node_address)
 
 corresponding_node[1]
 	-> icmp
-

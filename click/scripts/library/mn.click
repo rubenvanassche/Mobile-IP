@@ -46,6 +46,8 @@ elementclass MobileNode {
 		-> arp_res :: ARPResponder($address)
 		-> output;
 
+	dd :: MobileIPAgent;
+
 	in_cl[1]
 		-> [1]arpq;
 

@@ -1,0 +1,2 @@
+s :: MobileIPNode;
+s -> Discard;
