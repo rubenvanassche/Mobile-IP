@@ -4,7 +4,7 @@
 CLICK_DECLS
 
 MobileIPNode::MobileIPNode() {
-	this->simple_action(NULL);
+
 };
 MobileIPNode::~MobileIPNode() { };
 

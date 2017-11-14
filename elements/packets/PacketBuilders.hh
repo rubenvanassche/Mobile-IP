@@ -8,32 +8,51 @@
 #include "packets.hh"
 #include <click/packet.hh>
 #include <clicknet/udp.h>
+#include <clicknet/ether.h>
+#include <iostream>
 
 CLICK_DECLS
 
 /**
- * Sets an ip header to a packet
+ * Adds an ip and udp header to the packet
  */
 WritablePacket* IPfy(
-
-        IPAddress source,
-        IPAddress destination,
-        unsigned int ttl
+  WritablePacket* packet,
+  IPAddress source,
+  unsigned int sourcePort,
+  IPAddress destination,
+  unsigned int destinationPort,
+  unsigned int ttl
 );
 
-WritablePacket* UDPfy(
-        WritablePacket* packet,
-        unsigned int sourcePort,
-        unsigned int destinationPort
+/**
+ * Adds an tunnel for an given IP packet, creates a new packet
+ */
+Packet* buildTunnelIPPacket(
+    Packet* packet,
+    IPAddress source,
+    IPAddress destination
 );
 
+/**
+ * Builds an Mobile IP Registration request
+ */
 Packet* buildRegistrationRequestPacket(
-        unsigned int lifetime,
-        IPAddress home,
-        IPAddress homeAgent,
-        IPAddress careOf
+    unsigned int lifetime,
+    IPAddress home,
+    IPAddress homeAgent,
+    IPAddress careOf
 );
 
+/**
+ * Builds an Mobile IP Registration Reply
+ */
+Packet* buildRegistrationReplyPacket(
+    unsigned int lifetime,
+    uint8_t code,
+    IPAddress home,
+    IPAddress homeAgent
+);
 
 CLICK_ENDDECLS
 #endif //MOBILE_IP_PACKET_BUILDERS_HH
