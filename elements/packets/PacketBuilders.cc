@@ -87,6 +87,12 @@ Packet* buildTunnelIPPacket(
   return packet;
 }
 
+// IP source -> MN home adress
+// IP destination -> agent adres onbekend? -> 255.255.255.255
+//                -> FA gekend d.m.v. agent advertisement -> gebruik source adres van die advertisement
+//                -> HA adress gekend -> gebruik HA adress voor connectie met HA
+//                -> HA adress ongekend -> sectie 3.6.1.2 , te implementeren?
+// TTL -> 1 als 255.255.255.255, anders doe is zot
 Packet* buildRegistrationRequestPacket(
         unsigned int lifetime,
         IPAddress home,
@@ -125,6 +131,17 @@ Packet* buildRegistrationRequestPacket(
     return packet;
 }
 
+// Codes to send
+// FA
+// 64 -> reason unspecified
+// 69 -> requested lifetime too long
+// 70 -> poorly formed request
+// 71 -> poorly formed Reply
+// 72 -> requested encapsulation unavailable
+// HA
+// 128 -> reason unspecified
+// 134 -> poorly formed request
+// 136 -> unkown home adress
 Packet* buildRegistrationReplyPacket(
         unsigned int lifetime,
         uint8_t code,
