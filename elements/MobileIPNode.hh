@@ -20,6 +20,13 @@ class MobileIPNode : public Element {
 		const char *processing() const { return PUSH; }
 
 		Packet *simple_action(Packet *p);
+
+		// The home address of the MN
+		IPAddress homeAddress;
+		// The home agent adress of the MN
+		IPAddress homeAgentAddress;
+		// The care of adress obtained by the MN
+		IPAddress careOfAddress;
 };
 
 CLICK_ENDDECLS
