@@ -87,7 +87,13 @@ Packet* buildTunnelIPPacket(
   return packet;
 }
 
-Packet* buildRegistrationRequestPacket(
+// IP source -> MN home adress
+// IP destination -> agent adres onbekend? -> 255.255.255.255
+//                -> FA gekend d.m.v. agent advertisement -> gebruik source adres van die advertisement
+//                -> HA adress gekend -> gebruik HA adress voor connectie met HA
+//                -> HA adress ongekend -> sectie 3.6.1.2 , te implementeren?
+// TTL -> 1 als 255.255.255.255, anders doe is zot
+WritablePacket* buildRegistrationRequestPacket(
         unsigned int lifetime,
         IPAddress home,
         IPAddress homeAgent,
@@ -120,12 +126,21 @@ Packet* buildRegistrationRequestPacket(
     format->homeAgent = homeAgent.in_addr();
     format->careOfAddress = careOf.in_addr();
 
-    UDPIPfy(packet, IPAddress("1.0.0.1"), 1234, IPAddress("2.0.0.2"), 434, 250);
-
     return packet;
 }
 
-Packet* buildRegistrationReplyPacket(
+// Codes to send
+// FA
+// 64 -> reason unspecified
+// 69 -> requested lifetime too long
+// 70 -> poorly formed request
+// 71 -> poorly formed Reply
+// 72 -> requested encapsulation unavailable
+// HA
+// 128 -> reason unspecified
+// 134 -> poorly formed request
+// 136 -> unkown home adress
+WritablePacket* buildRegistrationReplyPacket(
         unsigned int lifetime,
         uint8_t code,
         IPAddress home,
@@ -149,8 +164,6 @@ Packet* buildRegistrationReplyPacket(
   format->lifetime = htons(lifetime);
   format->homeAddress = home.in_addr();
   format->homeAgent = homeAgent.in_addr();
-
-  UDPIPfy(packet, IPAddress("1.0.0.1"), 434, IPAddress("2.0.0.2"), 5454, 250);
 
   return packet;
 }

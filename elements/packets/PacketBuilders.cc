@@ -93,7 +93,7 @@ Packet* buildTunnelIPPacket(
 //                -> HA adress gekend -> gebruik HA adress voor connectie met HA
 //                -> HA adress ongekend -> sectie 3.6.1.2 , te implementeren?
 // TTL -> 1 als 255.255.255.255, anders doe is zot
-Packet* buildRegistrationRequestPacket(
+WritablePacket* buildRegistrationRequestPacket(
         unsigned int lifetime,
         IPAddress home,
         IPAddress homeAgent,
@@ -126,8 +126,6 @@ Packet* buildRegistrationRequestPacket(
     format->homeAgent = homeAgent.in_addr();
     format->careOfAddress = careOf.in_addr();
 
-    UDPIPfy(packet, IPAddress("1.0.0.1"), 1234, IPAddress("2.0.0.2"), 434, 250);
-
     return packet;
 }
 
@@ -142,7 +140,7 @@ Packet* buildRegistrationRequestPacket(
 // 128 -> reason unspecified
 // 134 -> poorly formed request
 // 136 -> unkown home adress
-Packet* buildRegistrationReplyPacket(
+WritablePacket* buildRegistrationReplyPacket(
         unsigned int lifetime,
         uint8_t code,
         IPAddress home,
@@ -166,8 +164,6 @@ Packet* buildRegistrationReplyPacket(
   format->lifetime = htons(lifetime);
   format->homeAddress = home.in_addr();
   format->homeAgent = homeAgent.in_addr();
-
-  UDPIPfy(packet, IPAddress("1.0.0.1"), 434, IPAddress("2.0.0.2"), 5454, 250);
 
   return packet;
 }

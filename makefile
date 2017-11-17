@@ -15,6 +15,9 @@ app:
 test:
 	cd click/scripts; ../userlevel/click test.click -p 1981
 
+debug:
+	cd click/scripts;  gdb ../userlevel/click
+
 run:
 	cd click/scripts; sudo ./start_click.sh
 

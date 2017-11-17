@@ -16,13 +16,13 @@ CLICK_DECLS
 /**
  * Adds an ip and udp header to the packet
  */
-WritablePacket* IPfy(
+WritablePacket* UDPIPfy(
   WritablePacket* packet,
   IPAddress source,
   unsigned int sourcePort,
   IPAddress destination,
   unsigned int destinationPort,
-  unsigned int ttl
+  uint8_t ttl
 );
 
 /**
@@ -37,7 +37,7 @@ Packet* buildTunnelIPPacket(
 /**
  * Builds an Mobile IP Registration request
  */
-Packet* buildRegistrationRequestPacket(
+WritablePacket* buildRegistrationRequestPacket(
     unsigned int lifetime,
     IPAddress home,
     IPAddress homeAgent,
@@ -47,7 +47,7 @@ Packet* buildRegistrationRequestPacket(
 /**
  * Builds an Mobile IP Registration Reply
  */
-Packet* buildRegistrationReplyPacket(
+WritablePacket* buildRegistrationReplyPacket(
     unsigned int lifetime,
     uint8_t code,
     IPAddress home,
