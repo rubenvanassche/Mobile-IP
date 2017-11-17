@@ -6,6 +6,35 @@
 
 CLICK_DECLS
 
+WritablePacket* IPfy(
+  WritablePacket* packet,
+  IPAddress source,
+  IPAddress destination,
+  uint8_t ttl
+){
+  packet->push(sizeof(click_ip));
+  click_ip *ip = reinterpret_cast<click_ip *>(packet->data());
+
+  // set up IP header
+  ip->ip_v = 4;
+  ip->ip_hl = sizeof(click_ip) >> 2;
+  ip->ip_len = htons(packet->length());
+  ip->ip_id = htons(0);
+  ip->ip_p = IP_PROTO_ICMP;
+  ip->ip_src = source.in_addr();
+  ip->ip_dst = destination.in_addr();
+  ip->ip_tos = 0;
+  ip->ip_off = 0;
+  ip->ip_ttl = ttl;
+
+  ip->ip_sum = 0;
+  ip->ip_sum = click_in_cksum((unsigned char *)ip, sizeof(click_ip));
+
+  packet->set_ip_header(ip, sizeof(click_ip));
+
+  return packet;
+}
+
 WritablePacket* UDPIPfy(
   WritablePacket* packet,
   IPAddress source,
@@ -83,6 +112,87 @@ Packet* buildTunnelIPPacket(
   ip->ip_sum = click_in_cksum((unsigned char *)ip, sizeof(click_ip));
 
   packet->set_ip_header(ip, sizeof(click_ip));
+
+  return packet;
+}
+
+WritablePacket* buildRouterAdvertisementMessage(
+  unsigned int lifetime,
+  unsigned int registrationLifetime,
+  IPAddress careOfAddress,
+  unsigned int sequenceNumber,
+  bool homeAgent,
+  bool foreignAgent
+){
+      int careOfAddresses = 1;
+      int tailroom = 0;
+      int packetsize = sizeof(routerAdvertisementMessage);
+      int headroom = sizeof(click_ip) + sizeof(click_ether);
+
+      WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
+      if (packet == 0){
+          click_chatter("cannot make router advertisement message!");
+          return NULL;
+      }
+
+      memset(packet->data(), 0, packet->length());
+      routerAdvertisementMessage* format = (routerAdvertisementMessage*) packet->data();
+
+      format->type = 9;
+      format->code = 0;
+      format->numAddrs = 0;
+      format->addrEntrySize = 2;
+      format->lifetime = htons(lifetime);
+
+      // Mobile IP
+      format->type2 = 16;
+      format->length = 6 + 4*careOfAddresses;
+      format->sequenceNumber = htons(sequenceNumber);
+      format->registrationLifetime = htons(registrationLifetime);
+
+      format->reserved = 0;
+      format->I = 0;
+      format->X = 0;
+      format->U = 0;
+      format->T = 0;
+      format->r = 0;
+      format->G = 0;
+      format->M = 0;
+      format->F = (int) foreignAgent;
+      format->H = (int) homeAgent;
+      format->B = 0; // TODO should be 1 if busy
+      format->R = 0; // TODO should be 1 if registration required
+
+      format->careOfAddresses[0] = careOfAddress.in_addr();
+
+      // Generate the checksum
+      format->checksum = 0;
+      format->checksum = click_in_cksum((unsigned char *)format, sizeof(routerAdvertisementMessage));
+
+      return packet;
+}
+
+WritablePacket* buildRouterSolicitationMessage(){
+  int tailroom = 0;
+  int packetsize = sizeof(routerSolicitationMessage);
+  int headroom = sizeof(click_ip) + sizeof(click_ether);
+
+  WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
+  if (packet == 0){
+      click_chatter("cannot make router solicitation message!");
+      return NULL;
+  }
+
+  memset(packet->data(), 0, packet->length());
+  routerSolicitationMessage* format = (routerSolicitationMessage*) packet->data();
+
+  format->type = 10;
+  format->code = 0;
+  format->reserved = 0;
+
+  // Generate the checksum
+  format->checksum = 0;
+  format->checksum = click_in_cksum((unsigned char *)format, sizeof(routerSolicitationMessage));
 
   return packet;
 }

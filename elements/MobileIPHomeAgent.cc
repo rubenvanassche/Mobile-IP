@@ -7,7 +7,7 @@ MobileIPHomeAgent::MobileIPHomeAgent() { };
 MobileIPHomeAgent::~MobileIPHomeAgent() { };
 
 Packet *MobileIPHomeAgent::simple_action(Packet *p) {
-	// TODO: fill
+
 
 	return p;
 };

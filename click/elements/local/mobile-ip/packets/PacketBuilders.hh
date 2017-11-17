@@ -14,6 +14,16 @@
 CLICK_DECLS
 
 /**
+ * Adds an ip hrader to the packet
+ */
+WritablePacket* IPfy(
+  WritablePacket* packet,
+  IPAddress source,
+  IPAddress destination,
+  uint8_t ttl
+);
+
+/**
  * Adds an ip and udp header to the packet
  */
 WritablePacket* UDPIPfy(
@@ -33,6 +43,23 @@ Packet* buildTunnelIPPacket(
     IPAddress source,
     IPAddress destination
 );
+
+/**
+ * Build an Router Advertisment Message
+ */
+WritablePacket* buildRouterAdvertisementMessage(
+    unsigned int lifetime,
+    unsigned int registrationLifetime,
+    IPAddress careOfAddress,
+    unsigned int sequenceNumber,
+    bool homeAgent,
+    bool foreignAgent
+);
+
+/**
+ * Build an Router Solicitation Message
+ */
+WritablePacket* buildRouterSolicitationMessage();
 
 /**
  * Builds an Mobile IP Registration request

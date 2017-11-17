@@ -31,5 +31,40 @@ struct registrationReplyPacket{
   uint32_t identification2 = 0x0; // Ignored
 };
 
+struct routerAdvertisementMessage{
+  uint8_t type; // should be 9
+  uint8_t code; // should be 0
+  uint16_t checksum;
+  uint8_t numAddrs; // should be 0
+  uint8_t addrEntrySize; // should be 2
+  uint16_t lifetime;
+  // uint_32 addresses[]
+  // Mobile IP Stuff
+  uint8_t type2; // should be 16
+  uint8_t length; // 6 + 4*N with N = number of care-of addresses
+  uint16_t sequenceNumber;
+  uint16_t registrationLifetime;
+  unsigned int T : 1; // Should be 0
+  unsigned int r : 1; // Should be 0
+  unsigned int G : 1; // Should be 0
+  unsigned int M : 1; // Should be 0
+  unsigned int F : 1; // Should be 1 if FA
+  unsigned int H : 1; // Should be 1 if HA
+  unsigned int B : 1; // Should be 1 if busy
+  unsigned int R : 1; // Should be 1 if registration required
+  unsigned int reserved : 5; // should be 0
+  unsigned int I : 1; // Should be 0
+  unsigned int X : 1; // Should be 0
+  unsigned int U : 1; // Should be 0
+  in_addr careOfAddresses[1];
+};
+
+struct routerSolicitationMessage{
+  uint8_t type; // should be 10
+  uint8_t code; // should be 0
+  uint16_t checksum;
+  uint32_t reserved; // should be 0
+};
+
 
 #endif

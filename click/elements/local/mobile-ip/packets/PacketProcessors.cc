@@ -6,6 +6,61 @@
 
 CLICK_DECLS
 
+UDPHeader processUDPHeader(Packet* packet){
+    UDPHeader structure;
+    click_udp* format = (click_udp*)(packet->network_header() + sizeof(click_ip));
+
+    if(packet->has_network_header() == false || packet->ip_header()->ip_p != IP_PROTO_UDP){
+      return structure;
+    }
+
+    structure.sourcePort = ntohs(format->uh_sport);
+    structure.destinationPort = ntohs(format->uh_dport);
+
+    if(format->uh_sum == 0){
+      throw new ZeroChecksumException("UDP Header");
+    }
+
+    // Check checksum
+    int length = ntohs(format->uh_ulen);
+    if(format->uh_sum != 0) {
+      unsigned csum = click_in_cksum((unsigned char *)packet->udp_header(), length);
+      if (click_in_cksum_pseudohdr(csum, packet->ip_header(), length) != 0)
+        throw new InvalidChecksumException("UDP Header");
+    }
+
+
+    return structure;
+}
+
+IPHeader processIPHeader(Packet* packet){
+  IPHeader structure;
+
+  if(packet->has_network_header() == false){
+    return structure;
+  }
+
+  click_ip* format = (click_ip*)(packet->network_header());
+
+  structure.source = IPAddress(format->ip_src);
+  structure.destination = IPAddress(format->ip_dst);
+
+  if(format->ip_sum == 0){
+    throw new ZeroChecksumException("IP Header");
+  }
+
+  // Checksum
+  unsigned int checksum = format->ip_sum;
+  format->ip_sum = 0;
+  unsigned int verifiedChecksum = click_in_cksum((unsigned char *)format, sizeof(click_ip));
+  if(verifiedChecksum != checksum){
+    throw new InvalidChecksumException("IP Header");
+  }
+  format->ip_sum = checksum;
+
+  return structure;
+}
+
 tunnelIP processTunnelIPPacket(Packet* packet, bool stripIPHeader){
     tunnelIP structure;
     click_ip* format = (click_ip*)(packet->data());
@@ -20,6 +75,33 @@ tunnelIP processTunnelIPPacket(Packet* packet, bool stripIPHeader){
 
     return structure;
 }
+
+
+routerAdvertisement processRouterAdvertisementMessage(Packet* packet){
+  routerAdvertisement structure;
+  routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data());
+
+  structure.lifetime = ntohs(format->lifetime);
+  structure.sequenceNumber = ntohs(format->sequenceNumber);
+  structure.registrationLifetime = ntohs(format->registrationLifetime);
+  structure.homeAgent = (bool) format->H;
+  structure.foreignAgent = (bool) format->H;
+  structure.careOfAddress = IPAddress(format->careOfAddresses[0]);
+
+  structure.IP = processIPHeader(packet);
+
+  return structure;
+}
+
+routerSolicitation processRouterSolicitationMessage(Packet* packet){
+  routerSolicitation structure;
+  routerSolicitationMessage* format = (routerSolicitationMessage*)(packet->data());
+
+  structure.IP = processIPHeader(packet);
+
+  return structure;
+}
+
 
 registrationRequest processRegistrationRequestPacket(Packet* packet){
     registrationRequest structure;
@@ -41,6 +123,8 @@ registrationRequest processRegistrationRequestPacket(Packet* packet){
     structure.homeAgent = IPAddress(format->homeAgent);
     structure.careOf = IPAddress(format->careOfAddress);
 
+    structure.UDP = processUDPHeader(packet);
+    structure.IP = processIPHeader(packet);
 
     return structure;
 }
@@ -55,6 +139,9 @@ registrationReply processRegistrationReplyPacket(Packet* packet){
   structure.code = format->code;
   structure.home = IPAddress(format->homeAddress);
   structure.homeAgent = IPAddress(format->homeAgent);
+
+  structure.UDP = processUDPHeader(packet);
+  structure.IP = processIPHeader(packet);
 
   return structure;
 }

@@ -7,10 +7,34 @@
   Structures for easy using of data in packets
  */
 
+struct UDPHeader{
+  unsigned int sourcePort;
+  unsigned int destinationPort;
+};
+
+struct IPHeader{
+  IPAddress source;
+  IPAddress destination;
+};
+
 struct tunnelIP{
     IPAddress source;
     IPAddress destination;
     unsigned int ttl;
+};
+
+struct routerAdvertisement{
+    unsigned int lifetime;
+    unsigned int sequenceNumber;
+    unsigned int registrationLifetime;
+    bool homeAgent;
+    bool foreignAgent;
+    IPAddress careOfAddress;
+    IPHeader IP;
+};
+
+struct routerSolicitation{
+    IPHeader IP;
 };
 
 struct registrationRequest{
@@ -26,6 +50,9 @@ struct registrationRequest{
     IPAddress home;
     IPAddress homeAgent;
     IPAddress careOf;
+
+    UDPHeader UDP;
+    IPHeader IP;
 };
 
 struct registrationReply{
@@ -33,6 +60,9 @@ struct registrationReply{
     unsigned int lifetime;
     IPAddress home;
     IPAddress homeAgent;
+
+    UDPHeader UDP;
+    IPHeader IP;
 };
 
 #endif

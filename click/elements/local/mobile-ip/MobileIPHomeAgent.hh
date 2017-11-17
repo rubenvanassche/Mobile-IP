@@ -2,6 +2,7 @@
 #define CLICK_MOBILEIPHOMEAGENT__HH
 
 #include <click/element.hh>
+#include "packets/PacketBuilders.hh"
 
 CLICK_DECLS
 

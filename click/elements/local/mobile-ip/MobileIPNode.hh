@@ -24,7 +24,17 @@ class MobileIPNode : public Element {
 
 		Packet *simple_action(Packet *p);
 
-		//bool sendRegistrationRequest(IPAddress destination, unsigned int lifetime);
+		// Register by Link-Layer protocol
+		bool registerLL();
+
+		// Register with a given Foreign Agent
+		bool registerFA(IPAddress FAAddress, unsigned int lifetime);
+
+		// Register with the home Agent
+		bool registerHA();
+
+		// Send a registration request package out
+		bool sendRegistrationRequest(IPAddress destination, unsigned int lifetime);
 
 		// The home address of the MN
 		IPAddress homeAddress;
@@ -33,7 +43,7 @@ class MobileIPNode : public Element {
 		// The care of adress obtained by the MN
 		IPAddress careOfAddress;
 		// Port from where the registration request packets get send
-		//unsigned int sourcePort = 5241;
+		unsigned int sourcePort = 5241;
 };
 
 CLICK_ENDDECLS
