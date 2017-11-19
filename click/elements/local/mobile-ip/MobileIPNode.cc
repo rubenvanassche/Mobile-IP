@@ -14,20 +14,18 @@ int MobileIPNode::configure(Vector<String> &conf, ErrorHandler *errh) {
 		.read_m("HA_ADDRESS",this->homeAgentAddress)
 		.execute() < 0){
 			return -1;
-			 // TODO: crashes here without reason
 		}
-
-		std::cout << this->homeAddress.s().c_str() << std::endl;
-		std::cout << this->homeAgentAddress.s().c_str() << std::endl;
 }
 
 Packet* MobileIPNode::simple_action(Packet *p) {
 	registrationReply r = processRegistrationReplyPacket(p);
 	std::cout << "cc" << r.IP.source.s().c_str() << std::endl;
 
+	/*
 	WritablePacket* m = buildRouterSolicitationMessage();
 	IPfy(m, IPAddress("124.58.1.1"), IPAddress("123.78.9.6"), 1);
 	output(0).push(m);
+	*/
 
 	return p;
 };

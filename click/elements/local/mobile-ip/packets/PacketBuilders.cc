@@ -6,7 +6,7 @@
 
 CLICK_DECLS
 
-WritablePacket* IPfy(
+WritablePacket* ICMPIPfy(
   WritablePacket* packet,
   IPAddress source,
   IPAddress destination,

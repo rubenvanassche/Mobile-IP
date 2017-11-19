@@ -16,7 +16,7 @@ CLICK_DECLS
 /**
  * Adds an ip hrader to the packet
  */
-WritablePacket* IPfy(
+WritablePacket* ICMPIPfy(
   WritablePacket* packet,
   IPAddress source,
   IPAddress destination,
