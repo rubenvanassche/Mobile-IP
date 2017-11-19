@@ -79,7 +79,9 @@ tunnelIP processTunnelIPPacket(Packet* packet, bool stripIPHeader){
 
 routerAdvertisement processRouterAdvertisementMessage(Packet* packet){
   routerAdvertisement structure;
-  routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data());
+
+  unsigned int offset = sizeof(click_ip);
+  routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset);
 
   structure.lifetime = ntohs(format->lifetime);
   structure.sequenceNumber = ntohs(format->sequenceNumber);
@@ -95,7 +97,9 @@ routerAdvertisement processRouterAdvertisementMessage(Packet* packet){
 
 routerSolicitation processRouterSolicitationMessage(Packet* packet){
   routerSolicitation structure;
-  routerSolicitationMessage* format = (routerSolicitationMessage*)(packet->data());
+
+  unsigned int offset = sizeof(click_ip);
+  routerSolicitationMessage* format = (routerSolicitationMessage*)(packet->data() + offset);
 
   structure.IP = processIPHeader(packet);
 

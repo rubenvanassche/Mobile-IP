@@ -13,7 +13,7 @@ int MobileIPNode::configure(Vector<String> &conf, ErrorHandler *errh) {
 		.read_m("HOME_ADDRESS", this->homeAddress)
 		.read_m("HA_ADDRESS",this->homeAgentAddress)
 		.execute() < 0){
-			return -1;
+			//return -1;
 		}
 }
 

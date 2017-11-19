@@ -5,6 +5,7 @@
 #include <click/args.hh>
 #include <click/timer.hh>
 #include "packets/PacketBuilders.hh"
+#include "packets/PacketProcessors.hh"
 
 CLICK_DECLS
 
@@ -40,7 +41,7 @@ class MobileIPAdvertiser : public Element {
 		bool isForeignAgent = false;
 
 		unsigned int sequenceNumber = 0;
-		unsigned int lifetime = 100;
+		unsigned int lifetime = 3; // From RFC 1256
 		unsigned int registrationLifetime = 10;
 
 		IPAddress linkAddress;

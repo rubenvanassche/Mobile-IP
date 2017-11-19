@@ -30,20 +30,27 @@ int MobileIPAdvertiser::initialize(ErrorHandler *) {
     return 0;
 }
 void MobileIPAdvertiser::run_timer(Timer *timer) {
-    // This function is called when the timer fires.
     assert(timer == &advertisementTimer);
     Timestamp now = Timestamp::now_steady();
-    click_chatter("%s: %p{timestamp}: timer fired with expiry %p{timestamp}!\n",
-                  declaration().c_str(), &now, &advertisementTimer.expiry_steady());
-           // _timer.expiry_steady() is the steady-clock Timestamp
-           // at which the timer was set to fire.
-    advertisementTimer.reschedule_after_sec(5);  // Fire again 5 seconds later.
+
+		this->sendAdvertisement();
+
+		int next = ceil(this->lifetime/3)*1000 - (rand() % 100);
+    advertisementTimer.reschedule_after_msec(next);
 }
 
 Packet* MobileIPAdvertiser::simple_action(Packet *p) {
-	// TODO: fill
+	try{
+		routerSolicitation r = processRouterSolicitationMessage(p);
+		this->sendAdvertisement(r.IP.source);
+	}catch(ZeroChecksumException &e){
+		click_chatter("Zero Checksum in Router Solicitation");
+	}catch(InvalidChecksumException &e){
+		click_chatter("Invalid Checksum in Router Solicitation");
+	}
 
-	return p;
+
+	return NULL;
 };
 
 bool MobileIPAdvertiser::sendAdvertisement(){
@@ -63,7 +70,12 @@ bool MobileIPAdvertiser::sendAdvertisement(IPAddress destination){
 	ICMPIPfy(packet, this->linkAddress, destination, 1);
 
 	// Raise the sequenceNumber
-	this->sequenceNumber++;
+	if(this->sequenceNumber == 65535){
+		this->sequenceNumber = 256;
+	}else{
+		this->sequenceNumber++;
+	}
+
 
 	output(0).push(packet);
 }
