@@ -56,7 +56,7 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		this->raiseLifetime(advertisement.lifetime);
 
 		// TODO: Register using Mobile IP
-		//
+		this->MN->reregister(advertisement.IP.source, advertisement.lifetime);
 
 
 		return NULL;

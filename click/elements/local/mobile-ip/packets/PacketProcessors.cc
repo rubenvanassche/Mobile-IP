@@ -17,10 +17,6 @@ UDPHeader processUDPHeader(Packet* packet){
     structure.sourcePort = ntohs(format->uh_sport);
     structure.destinationPort = ntohs(format->uh_dport);
 
-    if(format->uh_sum == 0){
-      throw new ZeroChecksumException("UDP Header");
-    }
-
     // Check checksum
     int length = ntohs(format->uh_ulen);
     if(format->uh_sum != 0) {

@@ -24,6 +24,12 @@ class MobileIPNode : public Element {
 
 		Packet *simple_action(Packet *p);
 
+		// Process a Reply
+		void processReply(registrationReply reply);
+
+		// Reregister a node when the node was moved
+		bool reregister(IPAddress address, unsigned int lifetime);
+
 		// Register by Link-Layer protocol
 		bool registerLL();
 
@@ -31,10 +37,13 @@ class MobileIPNode : public Element {
 		bool registerFA(IPAddress FAAddress, unsigned int lifetime);
 
 		// Register with the home Agent
-		bool registerHA();
+		bool registerHA(unsigned int lifetime);
 
-		// Send a registration request package out
-		bool sendRegistrationRequest(IPAddress destination, unsigned int lifetime);
+		// Deregister with home agent for all care-of-addresses
+		bool deregister(IPAddress FAAddress);
+
+		// Deregister with home agent for specified care of address
+		bool deregister(IPAddress FAAddress, IPAddress address);
 
 		// The home address of the MN
 		IPAddress homeAddress;
