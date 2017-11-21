@@ -9,10 +9,12 @@ MobileIPSoliciter::~MobileIPSoliciter() { };
 int MobileIPSoliciter::configure(Vector<String> &conf, ErrorHandler *errh) {
 	if(Args(conf, this, errh)
 		.read_m("LINK_ADDRESS", this->linkAddress)
-		.read("MN",ElementCastArg("MobileIPNode"), this->MN)
+		.read_m("MN",ElementCastArg("MobileIPNode"), this->MN)
 		.execute() < 0){
-			//return -1;
+			return -1;
 		}
+
+		std::cout << this->MN->homeAddress.s().c_str() << std::endl;
 }
 
 int MobileIPSoliciter::initialize(ErrorHandler *) {
@@ -47,7 +49,6 @@ void MobileIPSoliciter::move(){
 
 Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	routerAdvertisement advertisement = processRouterAdvertisementMessage(p);
-	std::cout << advertisement.sequenceNumber << std::endl;
 
 	if(this->connected == false){
 		this->routerAddress = advertisement.IP.source;

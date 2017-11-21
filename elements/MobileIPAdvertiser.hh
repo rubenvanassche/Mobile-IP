@@ -23,6 +23,7 @@ class MobileIPAdvertiser : public Element {
 
 		int configure(Vector<String> &conf, ErrorHandler *errh);
 		int initialize(ErrorHandler *errh);
+		void add_handlers();
 
 		const char *class_name() const { return "MobileIPAdvertiser"; }
 		const char *port_count() const { return "1/1"; }
@@ -30,10 +31,16 @@ class MobileIPAdvertiser : public Element {
 
 		Packet *simple_action(Packet *p);
 
+		// HANDLER for changing the lifetime
+		static int changeLifetimeHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
+
 		// Send to multicast address
 		bool sendAdvertisement();
 		// Send to specified unicast address
 		bool sendAdvertisement(IPAddress destination);
+
+		// Reset the lifetime Timer
+		void resetAdvertisementTimer(int seconds);
 
 		void run_timer(Timer *timer);
 
@@ -41,7 +48,7 @@ class MobileIPAdvertiser : public Element {
 		bool isForeignAgent = false;
 
 		unsigned int sequenceNumber = 0;
-		unsigned int lifetime = 3; // From RFC 1256
+		unsigned int lifetime = 1800; // From RFC 1256
 		unsigned int registrationLifetime = 10;
 
 		IPAddress linkAddress;
