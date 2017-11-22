@@ -7,6 +7,7 @@
 
 #include <click/ipaddress.hh>
 #include <vector>
+#include <iostream>
 
 struct RequestListItem{
   IPAddress FAAddress; // Only if applicable, needs not to be suported?
@@ -25,8 +26,18 @@ public:
   bool remove(RequestListItem* item);
 
   void decreaseLifetime(){
-    for(auto request : this->requests){
-      request.remainingLifetime -= 1;
+    for(auto it = this->requests.begin();it != this->requests.end();){
+      // Do not remove requests with zero lifetime because they are deregisters
+      if((*it).requestedLifetime != 0){
+        if((*it).remainingLifetime != 0){
+          (*it).remainingLifetime -= 1;
+
+          ++it;
+        }else{
+            std::cout << "Removed " << std::endl;
+            it = this->requests.erase(it);
+        }
+      }
     }
   }
 

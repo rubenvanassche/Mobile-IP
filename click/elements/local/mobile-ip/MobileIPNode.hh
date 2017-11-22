@@ -3,6 +3,7 @@
 
 #include <click/element.hh>
 #include <click/args.hh>
+#include <click/timer.hh>
 #include <iostream>
 #include "packets/PacketBuilders.hh"
 #include "packets/PacketProcessors.hh"
@@ -18,6 +19,11 @@ class MobileIPNode : public Element {
 		~MobileIPNode();
 
 		int configure(Vector<String> &conf, ErrorHandler *errh);
+		int initialize(ErrorHandler *errh);
+		void add_handlers();
+
+		// Temp function for register request sender
+		static int registerHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
 
 		const char *class_name() const { return "MobileIPNode"; }
 		const char *port_count() const { return "1/1"; }
@@ -46,6 +52,8 @@ class MobileIPNode : public Element {
 		// Deregister with home agent for specified care of address
 		bool deregister(IPAddress FAAddress, IPAddress address);
 
+		void run_timer(Timer *timer);
+
 		// The home address of the MN
 		IPAddress homeAddress;
 		// The home agent adress of the MN
@@ -57,6 +65,9 @@ class MobileIPNode : public Element {
 
 		// Structure for keeping pending registrations
 		RequestList requests;
+
+		// Keeps track of the lifetime in pending requests
+		Timer requestsTimer;
 };
 
 CLICK_ENDDECLS

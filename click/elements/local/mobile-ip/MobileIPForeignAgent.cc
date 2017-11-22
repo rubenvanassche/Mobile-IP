@@ -34,7 +34,7 @@ void MobileIPForeignAgent::add_handlers(){
 }
 
 Packet *MobileIPForeignAgent::simple_action(Packet *p) {
-	// TODO: fill
+	std::cout << "fffff" << std::endl;
 
 	return NULL;
 };

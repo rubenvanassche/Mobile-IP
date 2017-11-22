@@ -3,7 +3,7 @@
 
 CLICK_DECLS
 
-MobileIPNode::MobileIPNode() {
+MobileIPNode::MobileIPNode() : requestsTimer(this) {
 
 };
 MobileIPNode::~MobileIPNode() { };
@@ -19,6 +19,51 @@ int MobileIPNode::configure(Vector<String> &conf, ErrorHandler *errh) {
 		return 0;
 }
 
+int MobileIPNode::initialize(ErrorHandler *) {
+    requestsTimer.initialize(this);
+    requestsTimer.schedule_now();
+
+    return 0;
+}
+
+int MobileIPNode::registerHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh){
+		MobileIPNode* me = (MobileIPNode*) e;
+
+		int lifetime;
+		IPAddress address;
+		if(Args(errh).push_back_args(conf).read_m("IP", address).read_m("LT", lifetime).complete() < 0){
+				return -1;
+		}
+
+		me->reregister(address, lifetime);
+
+		return 0;
+}
+
+
+void MobileIPNode::add_handlers(){
+		add_write_handler("register", &registerHandler, (void *)0);
+}
+
+void MobileIPNode::run_timer(Timer *timer) {
+    assert(timer == &requestsTimer);
+    Timestamp now = Timestamp::now_steady();
+
+		// Decrease the lifetime by one in the pending requests table
+		this->requests.decreaseLifetime();
+
+		// Decrease the lifetime of the current registration if there is one
+		if(this->registrationLifetime > 0){
+			this->registrationLifetime -= 1;
+
+			if(this->registrationLifetime <= this->renewLifetime){
+				this->reregister();
+			}
+		}
+
+    requestsTimer.reschedule_after_sec(1);
+}
+
 Packet* MobileIPNode::simple_action(Packet *p) {
 	try{
 		registrationReply r = processRegistrationReplyPacket(p);
@@ -28,18 +73,19 @@ Packet* MobileIPNode::simple_action(Packet *p) {
 		return NULL;
 	}
 
-
-
 	return NULL;
 }
 
 void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 0 or reply.code == 1){
 		// TODO change routing table
+
 	}
 }
 
 bool MobileIPNode::reregister(IPAddress address, unsigned int lifetime){
+	this->connected = false;
+
 	if(this->homeAgentAddress == address){
 		this->registerHA(lifetime);
 	}else{

@@ -3,7 +3,7 @@
 
 CLICK_DECLS
 
-MobileIPNode::MobileIPNode() {
+MobileIPNode::MobileIPNode() : requestsTimer(this) {
 
 };
 MobileIPNode::~MobileIPNode() { };
@@ -19,6 +19,41 @@ int MobileIPNode::configure(Vector<String> &conf, ErrorHandler *errh) {
 		return 0;
 }
 
+int MobileIPNode::initialize(ErrorHandler *) {
+    requestsTimer.initialize(this);
+    requestsTimer.schedule_now();
+
+    return 0;
+}
+
+int MobileIPNode::registerHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh){
+		MobileIPNode* me = (MobileIPNode*) e;
+
+		int lifetime;
+		IPAddress address;
+		if(Args(errh).push_back_args(conf).read_m("IP", address).read_m("LT", lifetime).complete() < 0){
+				return -1;
+		}
+
+		me->reregister(address, lifetime);
+
+		return 0;
+}
+
+
+void MobileIPNode::add_handlers(){
+		add_write_handler("register", &registerHandler, (void *)0);
+}
+
+void MobileIPNode::run_timer(Timer *timer) {
+    assert(timer == &requestsTimer);
+    Timestamp now = Timestamp::now_steady();
+
+		this->requests.decreaseLifetime();
+
+    requestsTimer.reschedule_after_sec(1);
+}
+
 Packet* MobileIPNode::simple_action(Packet *p) {
 	try{
 		registrationReply r = processRegistrationReplyPacket(p);
@@ -27,8 +62,6 @@ Packet* MobileIPNode::simple_action(Packet *p) {
 		click_chatter("The registration reply contained an invalid checksum!");
 		return NULL;
 	}
-
-
 
 	return NULL;
 }
