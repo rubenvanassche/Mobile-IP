@@ -14,7 +14,7 @@ int MobileIPSoliciter::configure(Vector<String> &conf, ErrorHandler *errh) {
 			return -1;
 		}
 
-		std::cout << this->MN->homeAddress.s().c_str() << std::endl;
+		return 0;
 }
 
 int MobileIPSoliciter::initialize(ErrorHandler *) {

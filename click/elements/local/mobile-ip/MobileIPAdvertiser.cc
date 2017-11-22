@@ -21,6 +21,7 @@ int MobileIPAdvertiser::configure(Vector<String> &conf, ErrorHandler *errh) {
 			return -1;
 		}
 
+		return 0;
 }
 
 int MobileIPAdvertiser::initialize(ErrorHandler *) {

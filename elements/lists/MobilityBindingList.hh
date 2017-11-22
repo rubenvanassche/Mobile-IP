@@ -14,6 +14,7 @@ struct MobilityBindingListItem{
 };
 
 class MobilityBindingList{
+public:
   MobilityBindingList(){};
   ~MobilityBindingList(){};
 

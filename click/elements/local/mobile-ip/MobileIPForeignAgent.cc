@@ -14,6 +14,8 @@ int MobileIPForeignAgent::configure(Vector<String> &conf, ErrorHandler *errh) {
 		.execute() < 0){
 			return -1;
 		}
+
+		return 0;
 }
 
 int MobileIPForeignAgent::initialize(ErrorHandler *) {
@@ -23,6 +25,8 @@ int MobileIPForeignAgent::initialize(ErrorHandler *) {
 
     return 0;
 		*/
+
+	return 0;
 }
 
 void MobileIPForeignAgent::add_handlers(){

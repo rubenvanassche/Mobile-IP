@@ -6,6 +6,7 @@
 #include <iostream>
 #include "packets/PacketBuilders.hh"
 #include "packets/PacketProcessors.hh"
+#include "lists/RequestList.hh"
 
 CLICK_DECLS
 
@@ -53,6 +54,9 @@ class MobileIPNode : public Element {
 		IPAddress careOfAddress;
 		// Port from where the registration request packets get send
 		unsigned int sourcePort = 5241;
+
+		// Structure for keeping pending registrations
+		RequestList requests;
 };
 
 CLICK_ENDDECLS

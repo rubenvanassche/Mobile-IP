@@ -14,6 +14,8 @@ int MobileIPHomeAgent::configure(Vector<String> &conf, ErrorHandler *errh) {
 		.execute() < 0){
 			return -1;
 		}
+
+		return 0;
 }
 
 int MobileIPHomeAgent::initialize(ErrorHandler *) {
@@ -23,6 +25,8 @@ int MobileIPHomeAgent::initialize(ErrorHandler *) {
 
     return 0;
 		*/
+
+	return 0;
 }
 
 void MobileIPHomeAgent::add_handlers(){

@@ -18,6 +18,7 @@ struct VisitorListItem{
 };
 
 class VisitorsList{
+public:
   VisitorsList(){};
   ~VisitorsList(){};
 
