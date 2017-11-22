@@ -9,11 +9,12 @@ MobileIPNode::MobileIPNode() {
 MobileIPNode::~MobileIPNode() { };
 
 int MobileIPNode::configure(Vector<String> &conf, ErrorHandler *errh) {
-	if(Args(conf, this, errh)
+	if(Args(errh)
+		.bind(conf)
 		.read_m("HOME_ADDRESS", this->homeAddress)
 		.read_m("HA_ADDRESS",this->homeAgentAddress)
-		.execute() < 0){
-			//return -1;
+		.complete() < 0){
+			return -1;
 		}
 }
 
