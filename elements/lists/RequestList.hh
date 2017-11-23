@@ -13,8 +13,16 @@ struct RequestListItem{
   IPAddress FAAddress; // Only if applicable, needs not to be suported?
   IPAddress destination;
   IPAddress careOfAddress;
+
+  // Not needed every time
+  IPAddress homeAddress;
+  IPAddress homeAgentAddress;
+  IPAddress source;
+  unsigned int sourcePort;
+
   unsigned int requestedLifetime;
   unsigned int remainingLifetime;
+  unsigned int waitingTime = 0;
 };
 
 class RequestList{
@@ -38,6 +46,27 @@ public:
         }
       }
     }
+  }
+
+  std::vector<RequestListItem> removeTimedOutRequests(unsigned int seconds){
+    std::vector<RequestListItem> requests;
+
+    for(auto it = this->requests.begin();it != this->requests.end();){
+      it->waitingTime += 1;
+
+      if(it->waitingTime <= seconds){
+          it++;
+      }else{
+          requests.push_back(*it);
+          it = this->requests.erase(it);
+      }
+    }
+
+    return requests;
+  }
+
+  int size(){
+    return this->requests.size();
   }
 
   RequestListItem* find(IPAddress homeAddress, IPAddress homeAgent);

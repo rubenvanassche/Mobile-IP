@@ -3,7 +3,7 @@
 
 CLICK_DECLS
 
-MobileIPForeignAgent::MobileIPForeignAgent() { };
+MobileIPForeignAgent::MobileIPForeignAgent() : requestsTimer(this) { };
 MobileIPForeignAgent::~MobileIPForeignAgent() { };
 
 int MobileIPForeignAgent::configure(Vector<String> &conf, ErrorHandler *errh) {
@@ -19,14 +19,23 @@ int MobileIPForeignAgent::configure(Vector<String> &conf, ErrorHandler *errh) {
 }
 
 int MobileIPForeignAgent::initialize(ErrorHandler *) {
-		/*
-    advertisementTimer.initialize(this);
-    advertisementTimer.schedule_now();
+    requestsTimer.initialize(this);
+    requestsTimer.schedule_now();
 
-    return 0;
-		*/
+		return 0;
+}
 
-	return 0;
+void MobileIPForeignAgent::run_timer(Timer *timer) {
+    assert(timer == &requestsTimer);
+    Timestamp now = Timestamp::now_steady();
+
+		// Decrease the lifetime by one in the pending requests table
+		this->requests.decreaseLifetime();
+
+		// Remove pending requests running longer then 7 seconds
+		this->sendRequestTimedOutReply(this->requests.removeTimedOutRequests(7));
+
+    requestsTimer.reschedule_after_sec(1);
 }
 
 void MobileIPForeignAgent::add_handlers(){
@@ -34,34 +43,58 @@ void MobileIPForeignAgent::add_handlers(){
 }
 
 void MobileIPForeignAgent::push(int port, Packet *p) {
-	// Registration
-	getPacketType(p);
-	output(0).push(p);
+	// Priavte network
+	if(port == 0){
+		if(getPacketType(p) == REGISTRATION){
+			registrationRequest registration = processRegistrationRequestPacket(p);
 
-	// SOLICITATION
-	WritablePacket* s = buildRouterSolicitationMessage();
-	ICMPIPfy(s, IPAddress("192.1.11.1"), IPAddress("192.1.11.1"), 1);
-	getPacketType(s);
-	output(0).push(s);
+			// Create an new entry in the pending requests list
+			RequestListItem request;
+			request.destination = registration.IP.destination;
+			request.careOfAddress = registration.careOf;
+			request.requestedLifetime = registration.lifetime;
+			request.remainingLifetime = registration.lifetime;
+			request.homeAddress = registration.home;
+			request.homeAgentAddress = registration.homeAgent;
+			request.source = registration.IP.source;
+			request.sourcePort = registration.UDP.sourcePort;
 
-	// ADVERTISEMENT
-	WritablePacket* a = buildRouterAdvertisementMessage(10,100, IPAddress("192.1.11.1"),5,false, true);
-	ICMPIPfy(a, IPAddress("192.1.11.1"), IPAddress("192.1.11.1"), 1);
-	getPacketType(a);
-	output(0).push(a);
+			if(this->requests.size() <= this->maxPendingRegistrations){
+				this->requests.add(request);
+			}else{
+				this->sendTooManyRegistrationsReply(request);
+			}
 
-	// Reply
-	WritablePacket* r = buildRegistrationReplyPacket(10,1,IPAddress("192.1.11.1"), IPAddress("192.1.11.1"));
-	UDPIPfy(r, IPAddress("192.1.11.1"), 434, IPAddress("192.1.11.1"), 1850, 1);
-	getPacketType(r);
-	output(0).push(r);
 
-	Packet* i = buildTunnelIPPacket(r->clone(), IPAddress("192.1.11.1"), IPAddress("192.1.11.1"));
-	getPacketType(i);
-	output(0).push(i);
+		}
 
+		return;
+	}
+
+	// Public network
+	if(port == 1){
+
+		return;
+	}
 
 };
+
+void MobileIPForeignAgent::sendRequestTimedOutReply(std::vector<RequestListItem> requests){
+		for(auto request : requests){
+				WritablePacket* packet = buildRegistrationReplyPacket(request.requestedLifetime, 78, request.homeAddress, request.homeAgentAddress);
+				UDPIPfy(packet, this->privateAddress, 434, request.destination, request.sourcePort, 1);
+
+				output(0).push(packet);
+		}
+}
+
+void MobileIPForeignAgent::sendTooManyRegistrationsReply(RequestListItem request){
+		WritablePacket* packet = buildRegistrationReplyPacket(request.requestedLifetime, 66, request.homeAddress, request.homeAgentAddress);
+		UDPIPfy(packet, this->privateAddress, 434, request.destination, request.sourcePort, 1);
+
+		output(0).push(packet);
+}
+
 
 CLICK_ENDDECLS
 EXPORT_ELEMENT(MobileIPForeignAgent)

@@ -17,10 +17,10 @@ struct VisitorListItem{
   unsigned int remainingLifetime;
 };
 
-class VisitorsList{
+class VisitorList{
 public:
-  VisitorsList(){};
-  ~VisitorsList(){};
+  VisitorList(){};
+  ~VisitorList(){};
 
   bool remove(IPAddress homeAddress, IPAddress homeAgent);
   bool remove(VisitorListItem* item);

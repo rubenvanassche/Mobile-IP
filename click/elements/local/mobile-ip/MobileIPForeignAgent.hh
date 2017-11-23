@@ -6,6 +6,8 @@
 #include <click/timer.hh>
 #include "packets/PacketBuilders.hh"
 #include "packets/PacketProcessors.hh"
+#include "lists/RequestList.hh"
+#include "lists/VisitorList.hh"
 
 CLICK_DECLS
 
@@ -30,9 +32,25 @@ class MobileIPForeignAgent : public Element {
 
 		void push(int port, Packet *p);
 
+		void run_timer(Timer *timer);
+
+		void sendRequestTimedOutReply(std::vector<RequestListItem> requests);
+
+		void sendTooManyRegistrationsReply(RequestListItem request);
+
 		IPAddress publicAddress; // The public network address
 		IPAddress privateAddress; // The private network address
 		IPAddress HAAddress; // The address of the HA
+		unsigned int maxPendingRegistrations = 5; // The maximal amount of registrations
+
+		// The timer tracking the current requests
+		Timer requestsTimer;
+
+		// The requests that are waiting for an reply
+		RequestList requests;
+
+		// The visitor list
+		VisitorList visitors;
 };
 
 CLICK_ENDDECLS

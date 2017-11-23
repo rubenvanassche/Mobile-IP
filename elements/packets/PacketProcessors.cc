@@ -18,40 +18,26 @@ PacketType getPacketType(Packet* packet){
       routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset);
 
       if(format->type == 9 and format->type2 == 16){
-
-        std::cout << "Adv" << std::endl;
         return ADVERTISEMENT;
       }else if(format->type == 10){
-
-        std::cout << "sol" << std::endl;
         return SOLICITATION;
       }else{
-
-        std::cout << "Unkwonw0" << std::endl;
         return UNKOWN;
       }
     }else if(format->ip_p == IP_PROTO_IPIP){
-
-      std::cout << "ipip" << std::endl;
       return IPINIP;
     }else if(format->ip_p == IP_PROTO_UDP){
       unsigned int offset = sizeof(click_ip) + sizeof(click_udp);
       registrationReplyPacket* format = (registrationReplyPacket*)(packet->data() + offset);
 
       if(format->type == 1){
-
-        std::cout << "reg" << std::endl;
         return REGISTRATION;
       }else if(format->type == 3){
-
-        std::cout << "rep" << std::endl;
         return REPLY;
       }else{
-        std::cout << "Unkwonw0" << std::endl;
         return UNKOWN;
       }
     }else{
-      std::cout << "Unkwonw0" << std::endl;
       return UNKOWN;
     }
 

@@ -52,6 +52,8 @@ void MobileIPNode::run_timer(Timer *timer) {
 		// Decrease the lifetime by one in the pending requests table
 		this->requests.decreaseLifetime();
 
+		// TODO resend requests when no answer p50
+
 		// Decrease the lifetime of the current registration if there is one
 		if(this->registrationLifetime > 0){
 			this->registrationLifetime -= 1;
@@ -66,6 +68,10 @@ void MobileIPNode::run_timer(Timer *timer) {
 }
 
 Packet* MobileIPNode::simple_action(Packet *p) {
+	if(getPacketType(p) != REPLY){
+		return NULL;
+	}
+
 	try{
 		registrationReply r = processRegistrationReplyPacket(p);
 		this->processReply(r);
@@ -81,6 +87,16 @@ void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 0 or reply.code == 1){
 		// TODO change routing table
 
+	}
+
+	if(reply.code == 66){
+			click_chatter("Reply 66 : FA has too many pending registrations");
+			return;
+	}
+
+	if(reply.code == 78){
+			click_chatter("Reply 78 : FA registration time-out");
+			return;
 	}
 }
 
