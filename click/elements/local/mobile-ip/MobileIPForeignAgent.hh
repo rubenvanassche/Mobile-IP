@@ -37,14 +37,11 @@ class MobileIPForeignAgent : public Element {
 		// Send an reply to an request that has been in the requests list too long
 		void sendRequestTimedOutReply(std::vector<RequestListItem> requests);
 
-		// Send an reply to an request when there are too many requets in the requets list
-		void sendTooManyRegistrationsReply(registrationRequest registration);
+		// Sends an reply to the MN
+		void sendReply(registrationRequest registration, unsigned int code);
 
-		// Send an reply to an request when the reserved fields are not ZeroChecksumException
-		void sendIncorrectReservedFieldsReply(registrationRequest registration);
-
-		// Send an reply to an request when the care of address is not provided by this FA
-		void sendCareOfAddressNotProvidedReply(registrationRequest registration);
+		// Sends an reply to the MN with specified lifetime
+		void sendReply(registrationRequest registration, unsigned int code, unsigned int lifetime);
 
 		// Checks wheter the registration request packet is valid
 		bool checkRegistrationValidity(registrationRequest registration);

@@ -70,13 +70,11 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			request.careOfAddress = registration.careOf;
 			request.requestedLifetime = registration.lifetime;
 			request.remainingLifetime = registration.lifetime;
-			request.homeAddress = registration.home;
-			request.homeAgentAddress = registration.homeAgent;
-			request.source = registration.IP.source;
-			request.sourcePort = registration.UDP.sourcePort;
+			request.rr = registration;
 
 			this->requests.add(request);
 
+			// TODO Now send the request to the home agent p53
 
 		}
 
@@ -85,6 +83,20 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 
 	// Public network
 	if(port == 1){
+		if(getPacketType(p) == REPLY){
+			registrationReply reply;
+			try{
+				reply = processRegistrationReplyPacket(p);
+			}catch(ZeroChecksumException &e){
+				click_chatter("Reply from HA recieved at FA has an IP checksum 0");
+				return;
+			}catch(InvalidChecksumException &e){
+				click_chatter("Reply from HA recieved at FA has an invalid checksum");
+				return;
+			}
+
+
+		}
 
 		return;
 	}
@@ -93,32 +105,21 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 
 void MobileIPForeignAgent::sendRequestTimedOutReply(std::vector<RequestListItem> requests){
 		for(auto request : requests){
-				WritablePacket* packet = buildRegistrationReplyPacket(request.requestedLifetime, 78, request.homeAddress, request.homeAgentAddress);
-				UDPIPfy(packet, this->privateAddress, 434, request.destination, request.sourcePort, 1);
-
-				output(0).push(packet);
+				this->sendReply(request.rr, 78);
 		}
 }
 
-void MobileIPForeignAgent::sendTooManyRegistrationsReply(registrationRequest registration){
-	WritablePacket* packet = buildRegistrationReplyPacket(registration.lifetime, 66, registration.home, registration.homeAgent);
+
+
+void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned int code){
+	this->sendReply(registration, code, registration.lifetime);
+}
+
+void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned int code, unsigned int lifetime){
+	WritablePacket* packet = buildRegistrationReplyPacket(lifetime, code, registration.home, registration.homeAgent);
 	UDPIPfy(packet, this->privateAddress, 434, registration.IP.destination, registration.UDP.sourcePort, 1);
 
 	output(0).push(packet);
-}
-
-void MobileIPForeignAgent::sendIncorrectReservedFieldsReply(registrationRequest registration){
-		WritablePacket* packet = buildRegistrationReplyPacket(registration.lifetime, 70, registration.home, registration.homeAgent);
-		UDPIPfy(packet, this->privateAddress, 434, registration.IP.destination, registration.UDP.sourcePort, 1);
-
-		output(0).push(packet);
-}
-
-void MobileIPForeignAgent::sendCareOfAddressNotProvidedReply(registrationRequest registration){
-		WritablePacket* packet = buildRegistrationReplyPacket(registration.lifetime, 77, registration.home, registration.homeAgent);
-		UDPIPfy(packet, this->privateAddress, 434, registration.IP.destination, registration.UDP.sourcePort, 1);
-
-		output(0).push(packet);
 }
 
 bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registration){
@@ -126,19 +127,25 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 
 		// check if reserved fields are 0
 		if(registration.r != false){
-			this->sendIncorrectReservedFieldsReply(registration);
+			this->sendReply(registration, 70);
 			return false;
 		}
 
 		// Check if care-of address is offered by this FA
 		if(registration.careOf.in_addr() != this->careOfAddress.in_addr()){
-			this->sendCareOfAddressNotProvidedReply(registration);
+			this->sendReply(registration, 77);
 			return false;
 		}
 
 		// Check if there are too many pending requests
 		if(this->requests.size() >= this->maxPendingRegistrations){
-			this->sendTooManyRegistrationsReply(registration);
+			this->sendReply(registration, 66);
+			return false;
+		}
+
+		// check if lifetime is accepted by this FA
+		if(registration.lifetime > this->maxAcceptedLifetime){
+			this->sendReply(registration, 69, this->maxAcceptedLifetime);
 			return false;
 		}
 

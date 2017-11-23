@@ -6,6 +6,7 @@
 #define MOBILE_IP_LISTS_REQUESTLIST_HH
 
 #include <click/ipaddress.hh>
+#include "../packets/structures.hh"
 #include <vector>
 #include <iostream>
 
@@ -14,11 +15,8 @@ struct RequestListItem{
   IPAddress destination;
   IPAddress careOfAddress;
 
-  // Not needed every time
-  IPAddress homeAddress;
-  IPAddress homeAgentAddress;
-  IPAddress source;
-  unsigned int sourcePort;
+  // Only for FA
+  registrationRequest rr;
 
   unsigned int requestedLifetime;
   unsigned int remainingLifetime;
