@@ -37,6 +37,8 @@ void MobileIPForeignAgent::run_timer(Timer *timer) {
 		// Remove pending requests running longer then 7 seconds
 		this->sendRequestTimedOutReply(this->requests.removeTimedOutRequests(7));
 
+		// TODO remove visitors from visitorlist when remaaining lifetime is 0
+
     requestsTimer.reschedule_after_sec(1);
 }
 
@@ -110,16 +112,60 @@ void MobileIPForeignAgent::sendRequestTimedOutReply(std::vector<RequestListItem>
 }
 
 
-
 void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned int code){
 	this->sendReply(registration, code, registration.lifetime);
 }
 
 void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned int code, unsigned int lifetime){
+	IPAddress source = this->privateAddress;
+	IPAddress destination = registration.IP.destination;
+
+	// RFC p55
+	if(destination == IPAddress("255.255.255.255") ){
+		source = IPAddress("255.255.255.255");
+	}
+
+	if(registration.home == IPAddress("0.0.0.0")){
+		destination = IPAddress("255.255.255.255");
+	}
+
 	WritablePacket* packet = buildRegistrationReplyPacket(lifetime, code, registration.home, registration.homeAgent);
-	UDPIPfy(packet, this->privateAddress, 434, registration.IP.destination, registration.UDP.sourcePort, 1);
+	UDPIPfy(packet, source, 434, destination, registration.UDP.sourcePort, 1);
 
 	output(0).push(packet);
+}
+
+void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
+		if(reply.code == 0 or reply.code == 1){
+				// Home agent accepted
+				if(reply.lifetime == 0){
+					// Remove the MN from the visitors list
+					this->visitors.remove(reply.home, reply.homeAgent);
+				}else{
+					// Add or update visitors list
+					unsigned int remainingLifetime = std::min(reply.lifetime, this->maxAcceptedLifetime);
+
+					if(this->visitors.has(reply.home, reply.homeAgent)){
+						this->visitors.setVisitorRemainingLifetime(reply.home, reply.homeAgent, remainingLifetime);
+					}else{
+						// Add a new visitor
+						VisitorListItem visitor;
+						visitor.MNhome = reply.home;
+						visitor.MNhomeAgent = reply.homeAgent;
+						visitor.requestedLifetime = remainingLifetime;
+						visitor.remainingLifetime = remainingLifetime;
+
+						// TODO some fields are connected to a request, we need this information
+					}
+				}
+		}
+
+		// TODO how to determine that this reply replies to a specified request? Now implemented with homeAddress and homeAgentAddress
+		// But that doesn't seems right, better working with data givven in registration like care-of address and so
+		// Needs to be investigated
+		this->requests.remove(reply.home, reply.homeAgent);
+
+		// TODO Relay the reply
 }
 
 bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registration){
@@ -132,7 +178,7 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 		}
 
 		// Check if care-of address is offered by this FA
-		if(registration.careOf.in_addr() != this->careOfAddress.in_addr()){
+		if(registration.careOf != this->careOfAddress){
 			this->sendReply(registration, 77);
 			return false;
 		}

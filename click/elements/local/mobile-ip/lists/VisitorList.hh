@@ -6,6 +6,7 @@
 #define MOBILE_IP_LISTS_VISITORLIST_HH
 
 #include <click/ipaddress.hh>
+#include <vector>
 
 struct VisitorListItem{
   IPAddress MNsource;
@@ -22,13 +23,42 @@ public:
   VisitorList(){};
   ~VisitorList(){};
 
-  bool remove(IPAddress homeAddress, IPAddress homeAgent);
-  bool remove(VisitorListItem* item);
+  bool remove(IPAddress homeAddress, IPAddress homeAgentAddress){
+    for(auto it = this->visitors.begin();it != this->visitors.end();){
+      if(it->MNhome == homeAddress and it->MNhomeAgent == homeAgentAddress){
+        it = this->visitors.erase(it);
+      }else{
+        it++;
+      }
+    }
+  }
 
   VisitorListItem* find(IPAddress homeAddress, IPAddress homeAgent);
-  VisitorListItem* add(VisitorListItem item);
+  void add(VisitorListItem item);
 
-  bool has(VisitorListItem* item);
+  bool setVisitorRemainingLifetime(IPAddress homeAddress, IPAddress homeAgentAddress, unsigned int lifetime){
+    for(auto it = this->visitors.begin();it != this->visitors.end();){
+      if(it->MNhome == homeAddress and it->MNhomeAgent == homeAgentAddress){
+        it->remainingLifetime = lifetime;
+      }else{
+        it++;
+      }
+    }
+  }
+
+  bool has(IPAddress homeAddress, IPAddress homeAgentAddress){
+    for(auto it = this->visitors.begin();it != this->visitors.end();){
+      if(it->MNhome == homeAddress and it->MNhomeAgent == homeAgentAddress){
+        return true;
+      }else{
+        it++;
+      }
+    }
+
+    return false;
+  }
+private:
+  std::vector<VisitorListItem> visitors;
 };
 
 #endif //MOBILE_IP_LISTS_VISITORLIST_HH

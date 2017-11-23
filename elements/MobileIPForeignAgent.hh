@@ -4,6 +4,7 @@
 #include <click/element.hh>
 #include <click/args.hh>
 #include <click/timer.hh>
+#include <algorithm>
 #include "packets/PacketBuilders.hh"
 #include "packets/PacketProcessors.hh"
 #include "lists/RequestList.hh"
@@ -42,6 +43,9 @@ class MobileIPForeignAgent : public Element {
 
 		// Sends an reply to the MN with specified lifetime
 		void sendReply(registrationRequest registration, unsigned int code, unsigned int lifetime);
+
+		// Sends an reply recieved from the HA to the MN
+		void sendReplyFromHA(registrationReply reply);
 
 		// Checks wheter the registration request packet is valid
 		bool checkRegistrationValidity(registrationRequest registration);

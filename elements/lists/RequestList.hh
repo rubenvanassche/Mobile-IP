@@ -11,7 +11,6 @@
 #include <iostream>
 
 struct RequestListItem{
-  IPAddress FAAddress; // Only if applicable, needs not to be suported?
   IPAddress destination;
   IPAddress careOfAddress;
 
@@ -28,8 +27,15 @@ public:
   RequestList(){};
   ~RequestList(){};
 
-  bool remove(IPAddress homeAddress, IPAddress homeAgent);
-  bool remove(RequestListItem* item);
+  bool remove(IPAddress homeAddress, IPAddress homeAgentAddress){
+    for(auto it = this->requests.begin();it != this->requests.end();){
+      if(it->rr.home == homeAddress and it->rr.homeAgent == homeAgentAddress){
+        it = this->requests.erase(it);
+      }else{
+        it++;
+      }
+    }
+  }
 
   void decreaseLifetime(){
     for(auto it = this->requests.begin();it != this->requests.end();){
@@ -67,13 +73,9 @@ public:
     return this->requests.size();
   }
 
-  RequestListItem* find(IPAddress homeAddress, IPAddress homeAgent);
-  RequestListItem* add(RequestListItem item){
+  void add(RequestListItem item){
     this->requests.push_back(item);
-    return &(this->requests.back());
   }
-
-  bool has(RequestListItem* item);
 
 private:
   std::vector<RequestListItem> requests;
