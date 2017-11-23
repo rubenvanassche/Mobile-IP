@@ -16,6 +16,13 @@
 
 CLICK_DECLS
 
+enum PacketType {IPINIP, ADVERTISEMENT, SOLICITATION, REGISTRATION, REPLY, UNKOWN};
+
+/**
+ * Gets the type of packet that's being processed
+ */
+PacketType getPacketType(Packet* packet);
+
 /**
  * Get information from the UDP Header
  */

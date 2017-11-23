@@ -33,10 +33,34 @@ void MobileIPForeignAgent::add_handlers(){
 		//add_write_handler("set_lifetime", &changeLifetimeHandler, (void *)0);
 }
 
-Packet *MobileIPForeignAgent::simple_action(Packet *p) {
-	std::cout << "fffff" << std::endl;
+void MobileIPForeignAgent::push(int port, Packet *p) {
+	// Registration
+	getPacketType(p);
+	output(0).push(p);
 
-	return NULL;
+	// SOLICITATION
+	WritablePacket* s = buildRouterSolicitationMessage();
+	ICMPIPfy(s, IPAddress("192.1.11.1"), IPAddress("192.1.11.1"), 1);
+	getPacketType(s);
+	output(0).push(s);
+
+	// ADVERTISEMENT
+	WritablePacket* a = buildRouterAdvertisementMessage(10,100, IPAddress("192.1.11.1"),5,false, true);
+	ICMPIPfy(a, IPAddress("192.1.11.1"), IPAddress("192.1.11.1"), 1);
+	getPacketType(a);
+	output(0).push(a);
+
+	// Reply
+	WritablePacket* r = buildRegistrationReplyPacket(10,1,IPAddress("192.1.11.1"), IPAddress("192.1.11.1"));
+	UDPIPfy(r, IPAddress("192.1.11.1"), 434, IPAddress("192.1.11.1"), 1850, 1);
+	getPacketType(r);
+	output(0).push(r);
+
+	Packet* i = buildTunnelIPPacket(r->clone(), IPAddress("192.1.11.1"), IPAddress("192.1.11.1"));
+	getPacketType(i);
+	output(0).push(i);
+
+
 };
 
 CLICK_ENDDECLS

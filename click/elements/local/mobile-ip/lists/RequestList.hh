@@ -34,7 +34,6 @@ public:
 
           ++it;
         }else{
-            std::cout << "Removed " << std::endl;
             it = this->requests.erase(it);
         }
       }

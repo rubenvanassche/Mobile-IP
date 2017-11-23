@@ -14,7 +14,7 @@ s ->  EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test1.pcap") -> St
 f[1] -> [1]h;
 h[1] -> [1]f;
 m -> [0]f;
-f[0] -> m;
+f[0] -> EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test2.pcap") -> Strip(14) -> m;
 
 h[0] -> Discard;
 Idle -> [0]h

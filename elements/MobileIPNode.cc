@@ -57,7 +57,8 @@ void MobileIPNode::run_timer(Timer *timer) {
 			this->registrationLifetime -= 1;
 
 			if(this->registrationLifetime <= this->renewLifetime){
-				this->reregister();
+				// TODO rergister with same FA address + lifetime
+				//this->reregister();
 			}
 		}
 

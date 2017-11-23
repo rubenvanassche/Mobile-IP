@@ -6,6 +6,57 @@
 
 CLICK_DECLS
 
+PacketType getPacketType(Packet* packet){
+    if(packet->has_network_header() == false){
+      return UNKOWN;
+    }
+
+    click_ip* format = (click_ip*)(packet->network_header());
+
+    if(format->ip_p == IP_PROTO_ICMP){
+      unsigned int offset = sizeof(click_ip);
+      routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset);
+
+      if(format->type == 9 and format->type2 == 16){
+
+        std::cout << "Adv" << std::endl;
+        return ADVERTISEMENT;
+      }else if(format->type == 10){
+
+        std::cout << "sol" << std::endl;
+        return SOLICITATION;
+      }else{
+
+        std::cout << "Unkwonw0" << std::endl;
+        return UNKOWN;
+      }
+    }else if(format->ip_p == IP_PROTO_IPIP){
+
+      std::cout << "ipip" << std::endl;
+      return IPINIP;
+    }else if(format->ip_p == IP_PROTO_UDP){
+      unsigned int offset = sizeof(click_ip) + sizeof(click_udp);
+      registrationReplyPacket* format = (registrationReplyPacket*)(packet->data() + offset);
+
+      if(format->type == 1){
+
+        std::cout << "reg" << std::endl;
+        return REGISTRATION;
+      }else if(format->type == 3){
+
+        std::cout << "rep" << std::endl;
+        return REPLY;
+      }else{
+        std::cout << "Unkwonw0" << std::endl;
+        return UNKOWN;
+      }
+    }else{
+      std::cout << "Unkwonw0" << std::endl;
+      return UNKOWN;
+    }
+
+}
+
 UDPHeader processUDPHeader(Packet* packet){
     UDPHeader structure;
     click_udp* format = (click_udp*)(packet->network_header() + sizeof(click_ip));

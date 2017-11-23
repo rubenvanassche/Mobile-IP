@@ -49,7 +49,18 @@ void MobileIPNode::run_timer(Timer *timer) {
     assert(timer == &requestsTimer);
     Timestamp now = Timestamp::now_steady();
 
+		// Decrease the lifetime by one in the pending requests table
 		this->requests.decreaseLifetime();
+
+		// Decrease the lifetime of the current registration if there is one
+		if(this->registrationLifetime > 0){
+			this->registrationLifetime -= 1;
+
+			if(this->registrationLifetime <= this->renewLifetime){
+				// TODO rergister with same FA address + lifetime
+				//this->reregister();
+			}
+		}
 
     requestsTimer.reschedule_after_sec(1);
 }
@@ -69,10 +80,13 @@ Packet* MobileIPNode::simple_action(Packet *p) {
 void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 0 or reply.code == 1){
 		// TODO change routing table
+
 	}
 }
 
 bool MobileIPNode::reregister(IPAddress address, unsigned int lifetime){
+	this->connected = false;
+
 	if(this->homeAgentAddress == address){
 		this->registerHA(lifetime);
 	}else{

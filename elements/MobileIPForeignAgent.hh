@@ -9,7 +9,7 @@
 
 CLICK_DECLS
 
-// Input 0 -> private network
+// Input 0 -> private network - registration requests + solicitations
 // Input 1 -> public network
 // Output 0 -> private network
 // Output 1 -> public network
@@ -26,9 +26,9 @@ class MobileIPForeignAgent : public Element {
 
 		const char *class_name() const { return "MobileIPForeignAgent"; }
 		const char *port_count() const { return "2/2"; }
-		const char *processing() const { return AGNOSTIC; }
+		const char *processing() const { return PUSH; }
 
-		Packet *simple_action(Packet *p);
+		void push(int port, Packet *p);
 
 		IPAddress publicAddress; // The public network address
 		IPAddress privateAddress; // The private network address

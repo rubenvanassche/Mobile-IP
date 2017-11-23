@@ -62,6 +62,15 @@ class MobileIPNode : public Element {
 		IPAddress careOfAddress;
 		// Port from where the registration request packets get send
 		unsigned int sourcePort = 5241;
+		// Time when to renew a registration
+		unsigned int renewLifetime = 10; // TODO set this to values specified by RFC
+
+		// connected to agent?
+		bool connected = false;
+		// registration lifetime
+		unsigned int registrationLifetime = 0;
+		// Is the node home
+		bool home;
 
 		// Structure for keeping pending registrations
 		RequestList requests;
