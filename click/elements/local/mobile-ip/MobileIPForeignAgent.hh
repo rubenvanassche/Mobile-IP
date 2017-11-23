@@ -34,14 +34,28 @@ class MobileIPForeignAgent : public Element {
 
 		void run_timer(Timer *timer);
 
+		// Send an reply to an request that has been in the requests list too long
 		void sendRequestTimedOutReply(std::vector<RequestListItem> requests);
 
-		void sendTooManyRegistrationsReply(RequestListItem request);
+		// Send an reply to an request when there are too many requets in the requets list
+		void sendTooManyRegistrationsReply(registrationRequest registration);
+
+		// Send an reply to an request when the reserved fields are not ZeroChecksumException
+		void sendIncorrectReservedFieldsReply(registrationRequest registration);
+
+		// Send an reply to an request when the care of address is not provided by this FA
+		void sendCareOfAddressNotProvidedReply(registrationRequest registration);
+
+		// Checks wheter the registration request packet is valid
+		bool checkRegistrationValidity(registrationRequest registration);
 
 		IPAddress publicAddress; // The public network address
 		IPAddress privateAddress; // The private network address
+		IPAddress careOfAddress; // The care of address provided by this FA
 		IPAddress HAAddress; // The address of the HA
+
 		unsigned int maxPendingRegistrations = 5; // The maximal amount of registrations
+		unsigned int maxAcceptedLifetime = 1800; // The maximal lifetime this FA is accepting
 
 		// The timer tracking the current requests
 		Timer requestsTimer;

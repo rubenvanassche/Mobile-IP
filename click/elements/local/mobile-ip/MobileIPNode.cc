@@ -89,8 +89,19 @@ void MobileIPNode::processReply(registrationReply reply){
 
 	}
 
+
 	if(reply.code == 66){
 			click_chatter("Reply 66 : FA has too many pending registrations");
+			return;
+	}
+
+	if(reply.code == 70){
+			click_chatter("Reply 70 : FA poorly formed request");
+			return;
+	}
+
+	if(reply.code == 77){
+			click_chatter("Reply 77 : FA has not the same care of address as request");
 			return;
 	}
 

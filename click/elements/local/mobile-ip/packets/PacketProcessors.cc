@@ -59,7 +59,7 @@ UDPHeader processUDPHeader(Packet* packet){
     if(format->uh_sum != 0) {
       unsigned csum = click_in_cksum((unsigned char *)packet->udp_header(), length);
       if (click_in_cksum_pseudohdr(csum, packet->ip_header(), length) != 0)
-        throw new InvalidChecksumException("UDP Header");
+        throw  InvalidChecksumException("UDP Header");
     }
 
 
@@ -79,7 +79,7 @@ IPHeader processIPHeader(Packet* packet){
   structure.destination = IPAddress(format->ip_dst);
 
   if(format->ip_sum == 0){
-    throw new ZeroChecksumException("IP Header");
+    throw  ZeroChecksumException("IP Header");
   }
 
   // Checksum
@@ -87,7 +87,7 @@ IPHeader processIPHeader(Packet* packet){
   format->ip_sum = 0;
   unsigned int verifiedChecksum = click_in_cksum((unsigned char *)format, sizeof(click_ip));
   if(verifiedChecksum != checksum){
-    throw new InvalidChecksumException("IP Header");
+    throw InvalidChecksumException("IP Header");
   }
   format->ip_sum = checksum;
 

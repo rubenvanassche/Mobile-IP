@@ -15,6 +15,8 @@ int MobileIPForeignAgent::configure(Vector<String> &conf, ErrorHandler *errh) {
 			return -1;
 		}
 
+		this->careOfAddress = this->publicAddress;
+
 		return 0;
 }
 
@@ -46,7 +48,21 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 	// Priavte network
 	if(port == 0){
 		if(getPacketType(p) == REGISTRATION){
-			registrationRequest registration = processRegistrationRequestPacket(p);
+			registrationRequest registration;
+			try{
+				registration = processRegistrationRequestPacket(p);
+			}catch(ZeroChecksumException &e){
+				click_chatter("Request recieved at FA has an IP checksum 0");
+				return;
+			}catch(InvalidChecksumException &e){
+				click_chatter("Request recieved at FA has an invalid checksum");
+				return;
+			}
+
+			// Checks if the request recieved is valid
+			if(checkRegistrationValidity(registration) == false){
+				return;
+			}
 
 			// Create an new entry in the pending requests list
 			RequestListItem request;
@@ -59,13 +75,10 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			request.source = registration.IP.source;
 			request.sourcePort = registration.UDP.sourcePort;
 
-			if(this->requests.size() <= this->maxPendingRegistrations){
-				this->requests.add(request);
-			}else{
-				this->sendTooManyRegistrationsReply(request);
-			}
+			this->requests.add(request);
 
-
+			// Now send the request to the home agent
+			
 		}
 
 		return;
@@ -73,6 +86,20 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 
 	// Public network
 	if(port == 1){
+		if(getPacketType(p) == REPLY){
+			registrationReply reply;
+			try{
+				reply = processRegistrationReplyPacket(p);
+			}catch(ZeroChecksumException &e){
+				click_chatter("Reply from HA recieved at FA has an IP checksum 0");
+				return;
+			}catch(InvalidChecksumException &e){
+				click_chatter("Reply from HA recieved at FA has an invalid checksum");
+				return;
+			}
+
+
+		}
 
 		return;
 	}
@@ -88,11 +115,49 @@ void MobileIPForeignAgent::sendRequestTimedOutReply(std::vector<RequestListItem>
 		}
 }
 
-void MobileIPForeignAgent::sendTooManyRegistrationsReply(RequestListItem request){
-		WritablePacket* packet = buildRegistrationReplyPacket(request.requestedLifetime, 66, request.homeAddress, request.homeAgentAddress);
-		UDPIPfy(packet, this->privateAddress, 434, request.destination, request.sourcePort, 1);
+void MobileIPForeignAgent::sendTooManyRegistrationsReply(registrationRequest registration){
+	WritablePacket* packet = buildRegistrationReplyPacket(registration.lifetime, 66, registration.home, registration.homeAgent);
+	UDPIPfy(packet, this->privateAddress, 434, registration.IP.destination, registration.UDP.sourcePort, 1);
+
+	output(0).push(packet);
+}
+
+void MobileIPForeignAgent::sendIncorrectReservedFieldsReply(registrationRequest registration){
+		WritablePacket* packet = buildRegistrationReplyPacket(registration.lifetime, 70, registration.home, registration.homeAgent);
+		UDPIPfy(packet, this->privateAddress, 434, registration.IP.destination, registration.UDP.sourcePort, 1);
 
 		output(0).push(packet);
+}
+
+void MobileIPForeignAgent::sendCareOfAddressNotProvidedReply(registrationRequest registration){
+		WritablePacket* packet = buildRegistrationReplyPacket(registration.lifetime, 77, registration.home, registration.homeAgent);
+		UDPIPfy(packet, this->privateAddress, 434, registration.IP.destination, registration.UDP.sourcePort, 1);
+
+		output(0).push(packet);
+}
+
+bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registration){
+		// TODO Check if there are other devices in the subnet that send this request
+
+		// check if reserved fields are 0
+		if(registration.r != false){
+			this->sendIncorrectReservedFieldsReply(registration);
+			return false;
+		}
+
+		// Check if care-of address is offered by this FA
+		if(registration.careOf.in_addr() != this->careOfAddress.in_addr()){
+			this->sendCareOfAddressNotProvidedReply(registration);
+			return false;
+		}
+
+		// Check if there are too many pending requests
+		if(this->requests.size() >= this->maxPendingRegistrations){
+			this->sendTooManyRegistrationsReply(registration);
+			return false;
+		}
+
+		return true;
 }
 
 
