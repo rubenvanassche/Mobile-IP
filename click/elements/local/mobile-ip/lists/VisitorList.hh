@@ -46,6 +46,19 @@ public:
     }
   }
 
+  void decreaseLifetime(){
+    for(auto it = this->visitors.begin();it != this->visitors.end();){
+      // Do not remove requests with zero lifetime because they are deregisters
+      it->remainingLifetime -= 1;
+
+      if(it->remainingLifetime != 0){
+        it++;
+      }else{
+        it = this->visitors.erase(it);
+      }
+    }
+  }
+
   bool has(IPAddress homeAddress, IPAddress homeAgentAddress){
     for(auto it = this->visitors.begin();it != this->visitors.end();){
       if(it->MNhome == homeAddress and it->MNhomeAgent == homeAgentAddress){

@@ -76,6 +76,10 @@ WritablePacket* UDPIPfy(
   return packet;
 }
 
+WritablePacket* StripUDPIPHeader(WritablePacket* packet){
+  packet->pull(sizeof(click_udp) + sizeof(click_ip));
+}
+
 Packet* buildTunnelIPPacket(
     Packet* originalPacket,
     IPAddress source,

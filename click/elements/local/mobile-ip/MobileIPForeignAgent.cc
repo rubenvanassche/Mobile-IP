@@ -37,7 +37,8 @@ void MobileIPForeignAgent::run_timer(Timer *timer) {
 		// Remove pending requests running longer then 7 seconds
 		this->sendRequestTimedOutReply(this->requests.removeTimedOutRequests(7));
 
-		// TODO remove visitors from visitorlist when remaaining lifetime is 0
+		// remove visitors from visitorlist when remaaining lifetime is 0 and decrease the lifetime
+		this->visitors.decreaseLifetime();
 
     requestsTimer.reschedule_after_sec(1);
 }
@@ -76,7 +77,13 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 
 			this->requests.add(request);
 
-			// TODO Now send the request to the home agent p53
+			// Now send the request to the home agent
+			WritablePacket* packet = p->uniqueify();
+			StripUDPIPHeader(packet);
+			UDPIPfy(packet, this->careOfAddress, this->sourcePort, registration.homeAgent, 434, 1);
+
+			p->kill();
+
 
 		}
 
