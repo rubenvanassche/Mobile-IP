@@ -17,4 +17,3 @@ FromHost(tap2)
 
 home_agent[2]
 	-> Discard
-

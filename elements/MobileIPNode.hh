@@ -11,6 +11,10 @@
 
 CLICK_DECLS
 
+/**
+ * input 0 -> Registration Replies
+ * output 0 -> Registration request
+ */
 class MobileIPNode : public Element {
 	//TODO: Add private attributes
 
@@ -57,7 +61,9 @@ class MobileIPNode : public Element {
 		// The home address of the MN
 		IPAddress homeAddress;
 		// The home agent adress of the MN
-		IPAddress homeAgentAddress;
+		IPAddress homeAgentPublicAddress;
+		// The home agent adress of the MN on the link
+		IPAddress homeAgentPrivateAddress;
 		// The care of adress obtained by the MN
 		IPAddress careOfAddress;
 		// Port from where the registration request packets get send
@@ -70,7 +76,7 @@ class MobileIPNode : public Element {
 		// registration lifetime
 		unsigned int registrationLifetime = 0;
 		// Is the node home
-		bool home;
+		bool isHome = true;
 
 		// Structure for keeping pending registrations
 		RequestList requests;

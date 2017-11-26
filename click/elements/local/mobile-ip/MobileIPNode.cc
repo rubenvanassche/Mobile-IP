@@ -11,7 +11,8 @@ MobileIPNode::~MobileIPNode() { };
 int MobileIPNode::configure(Vector<String> &conf, ErrorHandler *errh) {
 	if(Args(conf, this, errh)
 		.read_m("HOME_ADDRESS", this->homeAddress)
-		.read_m("HA_ADDRESS",this->homeAgentAddress)
+		.read_m("HA_PRIVATE_ADDRESS",this->homeAgentPrivateAddress)
+		.read_m("HA_PUBLIC_ADDRESS",this->homeAgentPublicAddress)
 		.complete() < 0){
 			return -1;
 		}
@@ -85,8 +86,12 @@ Packet* MobileIPNode::simple_action(Packet *p) {
 
 void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 0 or reply.code == 1){
-		// TODO change routing table
-
+		this->connected == true;
+		if(reply.IP.source == this->homeAgentPrivateAddress){
+			this->isHome = true;
+		}else{
+			this->isHome = false;
+		}
 	}
 
 
@@ -114,7 +119,7 @@ void MobileIPNode::processReply(registrationReply reply){
 bool MobileIPNode::reregister(IPAddress address, unsigned int lifetime){
 	this->connected = false;
 
-	if(this->homeAgentAddress == address){
+	if(this->homeAgentPrivateAddress == address){
 		this->registerHA(lifetime);
 	}else{
 		this->registerFA(address, lifetime);
@@ -124,7 +129,7 @@ bool MobileIPNode::reregister(IPAddress address, unsigned int lifetime){
 bool MobileIPNode::registerLL(){
 	int lifetime = 1800;
 
-  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentAddress, this->careOfAddress);
+  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, IPAddress("224.0.0.11"), 434, 1);
 
 	RequestListItem r;
@@ -139,7 +144,7 @@ bool MobileIPNode::registerLL(){
 }
 
 bool MobileIPNode::registerFA(IPAddress FAAddress, unsigned int lifetime){
-  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentAddress, this->careOfAddress);
+  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, FAAddress, 434, 1);
 
 	RequestListItem r;
@@ -154,11 +159,11 @@ bool MobileIPNode::registerFA(IPAddress FAAddress, unsigned int lifetime){
 
 bool MobileIPNode::registerHA(unsigned int lifetime){
 	// Set ttl to 16 because why not?
-  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentAddress, this->careOfAddress);
-	UDPIPfy(packet, this->homeAddress, this->sourcePort, this->homeAgentAddress, 434, 16);
+  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
+	UDPIPfy(packet, this->homeAddress, this->sourcePort, this->homeAgentPrivateAddress, 434, 16);
 
 	RequestListItem r;
-	r.destination = this->homeAgentAddress;
+	r.destination = this->homeAgentPrivateAddress;
 	r.careOfAddress = this->careOfAddress;
 	r.requestedLifetime = lifetime;
 	r.remainingLifetime = lifetime;
@@ -170,7 +175,7 @@ bool MobileIPNode::registerHA(unsigned int lifetime){
 bool MobileIPNode::deregister(IPAddress FAAddress){
 	int lifetime = 0;
 
-	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentAddress, this->homeAddress);
+	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->homeAddress);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, FAAddress, 434, 1);
 
 	RequestListItem r;
@@ -186,7 +191,7 @@ bool MobileIPNode::deregister(IPAddress FAAddress){
 bool MobileIPNode::deregister(IPAddress FAAddress, IPAddress address){
 	int lifetime = 0;
 
-	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentAddress, this->careOfAddress);
+	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, FAAddress, 434, 1);
 
 	RequestListItem r;

@@ -48,6 +48,11 @@ void MobileIPSoliciter::move(){
 }
 
 Packet *MobileIPSoliciter::simple_action(Packet *p) {
+	if(getPacketType(p) != ADVERTISEMENT){
+		// TODO Send broadcast packets through to the link so other systems of the router can use it
+		return NULL;
+	}
+
 	routerAdvertisement advertisement = processRouterAdvertisementMessage(p);
 
 	if(this->connected == false){

@@ -21,10 +21,12 @@ elementclass MobileNode {
 		-> rt :: LinearIPLookup(
 			$address:ip/32 0,
 			$address:ipnet 1,
+			255.255.255.255 2,
 			0.0.0.0/0 $gateway 1)
 		-> [1]output;
 
-	rt[1]	-> ipgw :: IPGWOptions($address)
+
+	rt[1] ->  ipgw :: IPGWOptions($address)
 		-> FixIPSrc($address)
 		-> ttl :: DecIPTTL
 		-> frag :: IPFragmenter(1500)
@@ -46,11 +48,21 @@ elementclass MobileNode {
 		-> arp_res :: ARPResponder($address)
 		-> output;
 
-	dd :: MobileIPAgent;
 
 	in_cl[1]
 		-> [1]arpq;
 
 	in_cl[2]
 		-> ip;
+
+	// Mobile IP functionality
+	mipnode :: MobileIPNode(HOME_ADDRESS $address:ip, HA_PRIVATE_ADDRESS $gateway:ip, HA_PUBLIC_ADDRESS $home_agent:ip);
+	Idle -> mipnode;
+	mipnode -> arpq; // send registration requests out
+
+	// Get solicitations
+	mipsoliciter :: MobileIPSoliciter(LINK_ADDRESS $address:ip, MN mipnode);
+	mipsoliciter -> Discard; // ignore solicitations at this time
+	rt[2] -> mipsoliciter; // addresses on 255.255.255.255
+
 }

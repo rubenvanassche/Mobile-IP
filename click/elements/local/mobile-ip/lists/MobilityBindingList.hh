@@ -41,8 +41,36 @@ public:
     }
   }
 
-  void add(MobilityBindingListItem item){
-    this->mobilityBindings.push_back(item);
+  // Adds or updates an entry
+  void add(IPAddress homeAddress, IPAddress careOfAddress, unsigned int lifetime){
+    for(auto it = this->mobilityBindings.begin();it != this->mobilityBindings.end();){
+      if(it->homeAddress == homeAddress and it->careOfAddress == careOfAddress){
+        it->remainingLifetime = lifetime;
+        return;
+      }else{
+        it++;
+      }
+    }
+
+    MobilityBindingListItem m;
+    m.homeAddress = homeAddress;
+    m.careOfAddress = careOfAddress;
+    m.remainingLifetime = lifetime;
+
+    this->mobilityBindings.push_back(m);
+  }
+
+  void decreaseLifetime(){
+    for(auto it = this->mobilityBindings.begin();it != this->mobilityBindings.end();){
+      // Do not remove requests with zero lifetime because they are deregisters
+      it->remainingLifetime -= 1;
+
+      if(it->remainingLifetime != 0){
+        it++;
+      }else{
+        it = this->mobilityBindings.erase(it);
+      }
+    }
   }
 
   bool has(MobilityBindingListItem* item);

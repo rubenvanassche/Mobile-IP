@@ -31,6 +31,7 @@ WritablePacket* ICMPIPfy(
   ip->ip_sum = click_in_cksum((unsigned char *)ip, sizeof(click_ip));
 
   packet->set_ip_header(ip, sizeof(click_ip));
+  packet->set_dst_ip_anno(destination.in_addr());
 
   return packet;
 }
@@ -63,6 +64,7 @@ WritablePacket* UDPIPfy(
   ip->ip_sum = click_in_cksum((unsigned char *)ip, sizeof(click_ip));
 
   packet->set_ip_header(ip, sizeof(click_ip));
+  packet->set_dst_ip_anno(destination.in_addr());
 
   // set up UDP header
   uint16_t UDPLength = packet->length() - sizeof(click_ip);
@@ -116,6 +118,7 @@ Packet* buildTunnelIPPacket(
   ip->ip_sum = click_in_cksum((unsigned char *)ip, sizeof(click_ip));
 
   packet->set_ip_header(ip, sizeof(click_ip));
+  packet->set_dst_ip_anno(destination.in_addr());
 
   return packet;
 }
@@ -131,7 +134,7 @@ WritablePacket* buildRouterAdvertisementMessage(
       int careOfAddresses = 1;
       int tailroom = 0;
       int packetsize = sizeof(routerAdvertisementMessage);
-      int headroom = sizeof(click_ip) + sizeof(click_ether);
+      int headroom = sizeof(click_ip) + sizeof(click_ether) + 4;
 
       WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
       if (packet == 0){
@@ -215,7 +218,7 @@ WritablePacket* buildRegistrationRequestPacket(
 ){
     int tailroom = 0;
     int packetsize = sizeof(registrationRequestPacket);
-    int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
+    int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether) + 4;
 
     WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
     if (packet == 0){

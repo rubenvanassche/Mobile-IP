@@ -26,7 +26,7 @@ int MobileIPAdvertiser::configure(Vector<String> &conf, ErrorHandler *errh) {
 
 int MobileIPAdvertiser::initialize(ErrorHandler *) {
     advertisementTimer.initialize(this);
-    advertisementTimer.schedule_now();
+    advertisementTimer.schedule_after_sec(3); // Wait some time so the network is ready
 
     return 0;
 }

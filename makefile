@@ -1,4 +1,4 @@
-all: build test
+all: build run
 
 build: copy
 	cd click; make elemlist; make -j2
@@ -17,6 +17,9 @@ test:
 
 debug:
 	cd click/scripts;  gdb ../userlevel/click
+
+setup:
+	cd click/scripts; sudo ./setup.sh
 
 run:
 	cd click/scripts; sudo ./start_click.sh

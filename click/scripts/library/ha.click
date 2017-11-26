@@ -14,18 +14,16 @@ elementclass Agent {
 	$private_address, $public_address, $gateway |
 
 	// Shared IP input path and routing table
-	ip :: Strip(14)
-		-> CheckIPHeader
-		-> rt :: StaticIPLookup(
+	rt :: StaticIPLookup(
 					$private_address:ip/32 0,
 					$public_address:ip/32 0,
 					$private_address:ipnet 1,
 					$public_address:ipnet 2,
 					0.0.0.0/0 $gateway 2);
-	
+
 	// ARP responses are copied to each ARPQuerier and the host.
 	arpt :: Tee (2);
-	
+
 	// Input and output paths for interface 0
 	input
 		-> HostEtherFilter($private_address)
@@ -42,7 +40,10 @@ elementclass Agent {
 
 	private_class[2]
 		-> Paint(1)
-		-> ip;
+		-> Strip(14)
+		-> CheckIPHeader
+		-> private_mipclass :: MobileIPClassifier
+		-> rt;
 
 	// Input and output paths for interface 1
 	input[1]
@@ -60,12 +61,16 @@ elementclass Agent {
 
 	public_class[2]
 		-> Paint(2)
-		-> ip;
+		-> Strip(14)
+		-> CheckIPHeader
+		-> public_mipclass :: MobileIPClassifier
+		-> rt;
+
 
 	// Local delivery
 	rt[0]
 		-> [2]output
-	
+
 	// Forwarding paths per interface
 	rt[1]
 		-> DropBroadcasts
@@ -75,7 +80,7 @@ elementclass Agent {
 		-> private_ttl :: DecIPTTL
 		-> private_frag :: IPFragmenter(1500)
 		-> private_arpq;
-	
+
 	private_paint[1]
 		-> ICMPError($private_address, redirect, host)
 		-> rt;
@@ -91,7 +96,7 @@ elementclass Agent {
 	private_frag[1]
 		-> ICMPError($private_address, unreachable, needfrag)
 		-> rt;
-	
+
 
 	rt[2]
 		-> DropBroadcasts
@@ -101,7 +106,7 @@ elementclass Agent {
 		-> public_ttl :: DecIPTTL
 		-> public_frag :: IPFragmenter(1500)
 		-> public_arpq;
-	
+
 	public_paint[1]
 		-> ICMPError($public_address, redirect, host)
 		-> rt;
@@ -117,4 +122,26 @@ elementclass Agent {
 	public_frag[1]
 		-> ICMPError($public_address, unreachable, needfrag)
 		-> rt;
+
+		// Advertise Mobile IP to clients on private network
+		mipadvertiser :: MobileIPAdvertiser(LINK_ADDRESS $private_address:ip, CAREOF_ADDRESS $public_address:ip, FA false, HA true);
+		Idle -> mipadvertiser; // Because we don't expect solicitations
+		mipadvertiser -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)  -> output;
+
+		// This is a home agent so act like one
+		mipagent :: MobileIPHomeAgent(PRIVATE_ADDRESS $private_address:ip, PUBLIC_ADDRESS $public_address:ip, FA_ADDRESS $gateway:ip);
+		mipagent[0] -> private_arpq;
+		mipagent[1] -> public_arpq;
+
+		// Registration requests
+		private_mipclass[1] -> [0]mipagent;
+		public_mipclass[1] -> [1]mipagent;
+
+		// Registration replies
+		private_mipclass[2] -> [0]mipagent;
+		public_mipclass[2] -> [1]mipagent; 
+
+		// Uneeded at this time
+		public_mipclass[3] -> Discard;
+		private_mipclass[3] -> Discard;
 }

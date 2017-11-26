@@ -25,14 +25,14 @@ int MobileIPHomeAgent::initialize(ErrorHandler *) {
 	return 0;
 }
 
-void MobileIPForeignAgent::run_timer(Timer *timer) {
-    assert(timer == &requestsTimer);
+void MobileIPHomeAgent::run_timer(Timer *timer) {
+    assert(timer == &mobilityBindingListTimer);
     Timestamp now = Timestamp::now_steady();
 
 		// Decrease the lifetime by one in the pending requests table
 		this->mobilityBindings.decreaseLifetime();
 
-    requestsTimer.reschedule_after_sec(1);
+    mobilityBindingListTimer.reschedule_after_sec(1);
 }
 
 void MobileIPHomeAgent::add_handlers(){
@@ -63,16 +63,16 @@ void MobileIPHomeAgent::push(int port, Packet *p) {
 		}
 
 		if(registration.lifetime == 0){
-			if(registration.careOf = registration.home){
+			if(registration.careOf == registration.home){
 				// Remove all bindings
-				this->mobilityBindings.remove(registration.home)
+				this->mobilityBindings.remove(registration.home);
 			}else{
 				// Remove binding for this careOf address
 				this->mobilityBindings.remove(registration.home, registration.careOf);
 			}
 
 			// Send a reply to indicate that the request was accpeted to delete
-			this->sendReply(registrationRequest, 1, port, 0);
+			this->sendReply(registration, 1, port, 0);
 		}else{
 			// Now let's check the lifetime
 			unsigned int lifetime = registration.lifetime;
@@ -82,7 +82,7 @@ void MobileIPHomeAgent::push(int port, Packet *p) {
 
 			// Add and send reply
 			this->mobilityBindings.add(registration.home, registration.careOf, lifetime);
-			this->sendReply(registrationRequest, 1, port, lifetime);
+			this->sendReply(registration, 1, port, lifetime);
 		}
 	}
 };
@@ -121,7 +121,7 @@ bool MobileIPHomeAgent::checkForUnkwownHomeAgent(registrationRequest registratio
 	}
 
 	// Check if we've got the correct home agent address
-	if(registration.homeAgent == goToAddress and registration.IP.destination == goToAddress){
+	if(registration.homeAgent == this->publicAddress and registration.IP.destination == goToAddress){
 		return true;
 	}
 
@@ -133,7 +133,7 @@ bool MobileIPHomeAgent::checkForUnkwownHomeAgent(registrationRequest registratio
 		source = goToAddress;
 	}
 
-	WritablePacket* packet = buildRegistrationReplyPacket(this->maxAcceptedLifetime, 136, registration.home, goToAddress);
+	WritablePacket* packet = buildRegistrationReplyPacket(this->maxAcceptedLifetime, 136, registration.home, this->publicAddress);
 	UDPIPfy(packet, source, 434, destination, registration.UDP.sourcePort, 1);
 
 	output(port).push(packet);

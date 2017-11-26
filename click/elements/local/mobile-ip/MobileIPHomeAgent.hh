@@ -31,6 +31,8 @@ class MobileIPHomeAgent : public Element {
 
 		void push(int port, Packet *p);
 
+		void run_timer(Timer *timer);
+
 		// Sends an reply to the MN
 		void sendReply(registrationRequest registration, unsigned int code, unsigned int port);
 
@@ -49,6 +51,9 @@ class MobileIPHomeAgent : public Element {
 
 		unsigned int maxAcceptedLifetime = 1800; // The maximal lifetime this HA is accepting
 		unsigned int sourcePort = 5241;
+
+		// Timer that decreases the lifetime i the mobility list
+		Timer mobilityBindingListTimer;
 
 		// The Mobility Bindings
 		MobilityBindingList mobilityBindings;
