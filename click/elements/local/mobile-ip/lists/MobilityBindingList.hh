@@ -7,6 +7,8 @@
 
 #include <click/ipaddress.hh>
 #include <vector>
+#include <string>
+#include <sstream>
 
 struct MobilityBindingListItem{
   IPAddress homeAddress;
@@ -71,6 +73,20 @@ public:
         it = this->mobilityBindings.erase(it);
       }
     }
+  }
+
+  std::string print(){
+    std::stringstream out;
+    out << "--------------------------------\n";
+    for(auto it = this->mobilityBindings.begin();it != this->mobilityBindings.end();it++){
+      out << it->homeAddress.s().c_str();
+      out <<  "   ";
+      out <<  it->remainingLifetime;
+      out << "\n";
+    }
+    out << "------------------------------------\n";
+
+    return out.str();
   }
 
   bool has(MobilityBindingListItem* item);

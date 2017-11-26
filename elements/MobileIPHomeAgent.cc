@@ -31,6 +31,8 @@ void MobileIPHomeAgent::run_timer(Timer *timer) {
 
 		// Decrease the lifetime by one in the pending requests table
 		this->mobilityBindings.decreaseLifetime();
+		//std::cout << this->mobilityBindings.print() << std::endl;
+
 
     mobilityBindingListTimer.reschedule_after_sec(1);
 }
@@ -42,6 +44,7 @@ void MobileIPHomeAgent::add_handlers(){
 void MobileIPHomeAgent::push(int port, Packet *p) {
 	if(getPacketType(p) == REGISTRATION){
 		registrationRequest registration;
+
 		try{
 			registration = processRegistrationRequestPacket(p);
 		}catch(ZeroChecksumException &e){
@@ -121,7 +124,7 @@ bool MobileIPHomeAgent::checkForUnkwownHomeAgent(registrationRequest registratio
 	}
 
 	// Check if we've got the correct home agent address
-	if(registration.homeAgent == this->publicAddress and registration.IP.destination == goToAddress){
+	if(registration.homeAgent == this->publicAddress and (registration.IP.destination == this->privateAddress or registration.IP.destination == this->publicAddress)){
 		return true;
 	}
 

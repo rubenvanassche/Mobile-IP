@@ -70,7 +70,7 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			// Create an new entry in the pending requests list
 			RequestListItem request;
 			request.destination = registration.IP.destination;
-			request.careOfAddress = registration.careOf;
+			request.careOfAddress = this->careOfAddress;
 			request.requestedLifetime = registration.lifetime;
 			request.remainingLifetime = registration.lifetime;
 			request.rr = registration;
@@ -78,9 +78,10 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			this->requests.add(request);
 
 			// Now send the request to the home agent
-			WritablePacket* packet = p->uniqueify();
-			StripUDPIPHeader(packet);
-			UDPIPfy(packet, this->careOfAddress, this->sourcePort, registration.homeAgent, 434, 1);
+			WritablePacket* packet = buildRegistrationRequestPacket(registration.lifetime, registration.home, registration.homeAgent, this->careOfAddress);
+			UDPIPfy(packet, this->careOfAddress, this->sourcePort, registration.homeAgent, 434, 16);
+			output(1).push(packet);
+
 
 			p->kill();
 		}
@@ -102,6 +103,10 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 				return;
 			}
 
+			this->sendReplyFromHA(reply);
+
+			// Kill the packet because we've dealt with it
+			p->kill();
 
 		}
 
@@ -123,7 +128,7 @@ void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned 
 
 void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned int code, unsigned int lifetime){
 	IPAddress source = this->privateAddress;
-	IPAddress destination = registration.IP.destination;
+	IPAddress destination = registration.IP.source;
 
 	// RFC p55
 	if(destination == IPAddress("255.255.255.255") ){
@@ -170,7 +175,11 @@ void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
 		// Needs to be investigated
 		this->requests.remove(reply.home, reply.homeAgent);
 
-		// TODO Relay the reply
+		// TODO Relay the reply(checking the RFC is needed)
+		// TODO set the right destination port
+		WritablePacket* packet = buildRegistrationReplyPacket(reply.lifetime, reply.code, reply.home, reply.homeAgent);
+		UDPIPfy(packet, this->privateAddress, 434, reply.home, 5584, 1);
+		output(0).push(packet);
 }
 
 bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registration){
@@ -182,11 +191,6 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 			return false;
 		}
 
-		// Check if care-of address is offered by this FA
-		if(registration.careOf != this->careOfAddress){
-			this->sendReply(registration, 77);
-			return false;
-		}
 
 		// Check if there are too many pending requests
 		if(this->requests.size() >= this->maxPendingRegistrations){

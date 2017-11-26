@@ -87,10 +87,13 @@ Packet* MobileIPNode::simple_action(Packet *p) {
 void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 0 or reply.code == 1){
 		this->connected == true;
+
 		if(reply.IP.source == this->homeAgentPrivateAddress){
 			this->isHome = true;
+			click_chatter("Connected to HA");
 		}else{
 			this->isHome = false;
+			click_chatter("Connected to FA");
 		}
 	}
 

@@ -14,9 +14,7 @@ elementclass Agent {
 	$private_address, $public_address, $gateway |
 
 	// Shared IP input path and routing table
-	ip :: Strip(14)
-		-> CheckIPHeader
-		-> rt :: StaticIPLookup(
+	rt :: StaticIPLookup(
 					$private_address:ip/32 0,
 					$public_address:ip/32 0,
 					$private_address:ipnet 1,
@@ -25,11 +23,6 @@ elementclass Agent {
 
 	// ARP responses are copied to each ARPQuerier and the host.
 	arpt :: Tee (2);
-
-	// Advertise Mobile IP to clients on private network
-	mipadvertiser :: MobileIPAdvertiser(LINK_ADDRESS $private_address:ip, CAREOF_ADDRESS $public_address:ip, FA true, HA false);
-	Idle -> mipadvertiser; // Because we don't expect solicitations
-	mipadvertiser -> EtherEncap(0x0800, $private_address:ether, FF:FF:FF:FF:FF:FF) -> output;
 
 	// Input and output paths for interface 0
 	input
@@ -47,7 +40,10 @@ elementclass Agent {
 
 	private_class[2]
 		-> Paint(1)
-		-> ip;
+		-> Strip(14)
+		-> CheckIPHeader
+		-> private_mipclass :: MobileIPClassifier
+		-> rt;
 
 	// Input and output paths for interface 1
 	input[1]
@@ -65,7 +61,11 @@ elementclass Agent {
 
 	public_class[2]
 		-> Paint(2)
-		-> ip;
+		-> Strip(14)
+		-> CheckIPHeader
+		-> public_mipclass :: MobileIPClassifier
+		-> rt;
+
 
 	// Local delivery
 	rt[0]
@@ -122,4 +122,26 @@ elementclass Agent {
 	public_frag[1]
 		-> ICMPError($public_address, unreachable, needfrag)
 		-> rt;
+
+		// Advertise Mobile IP to clients on private network
+		mipadvertiser :: MobileIPAdvertiser(LINK_ADDRESS $private_address:ip, CAREOF_ADDRESS $public_address:ip, FA true, HA false);
+		Idle -> mipadvertiser; // Because we don't expect solicitations
+		mipadvertiser -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)  -> output;
+
+		// This is a home agent so act like one
+		mipagent :: MobileIPForeignAgent(PRIVATE_ADDRESS $private_address:ip, PUBLIC_ADDRESS $public_address:ip, HA_ADDRESS $gateway:ip);
+		mipagent[0] -> private_arpq;
+		mipagent[1] -> public_arpq;
+
+		// Registration requests
+		private_mipclass[1] -> [0]mipagent;
+		public_mipclass[1] -> Discard; // Only requests from private network possible
+
+		// Registration replies
+		private_mipclass[2] -> Discard; // Only replies from public network possible
+		public_mipclass[2] -> [1]mipagent;
+
+		// Uneeded at this time
+		public_mipclass[3] -> Discard;
+		private_mipclass[3] -> Discard;
 }

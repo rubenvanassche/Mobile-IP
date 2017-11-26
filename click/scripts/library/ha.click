@@ -137,9 +137,9 @@ elementclass Agent {
 		private_mipclass[1] -> [0]mipagent;
 		public_mipclass[1] -> [1]mipagent;
 
-		// Registration replies
-		private_mipclass[2] -> [0]mipagent;
-		public_mipclass[2] -> [1]mipagent; 
+		// Registration replies are discarded because we send them
+		private_mipclass[2] -> Discard;
+		public_mipclass[2] -> Discard;
 
 		// Uneeded at this time
 		public_mipclass[3] -> Discard;

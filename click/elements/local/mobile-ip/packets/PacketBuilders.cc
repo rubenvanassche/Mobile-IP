@@ -265,7 +265,7 @@ WritablePacket* buildRegistrationReplyPacket(
 ){
   int tailroom = 0;
   int packetsize = sizeof(registrationReplyPacket);
-  int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether);
+  int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether) + 4;
 
   WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
   if (packet == 0){
