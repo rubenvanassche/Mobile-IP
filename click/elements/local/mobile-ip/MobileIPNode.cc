@@ -123,7 +123,8 @@ bool MobileIPNode::reregister(IPAddress address, unsigned int lifetime){
 	this->connected = false;
 
 	if(this->homeAgentPrivateAddress == address){
-		this->registerHA(lifetime);
+		// TODO should delete registration with FA
+		//this->registerHA(lifetime);
 	}else{
 		this->registerFA(address, lifetime);
 	}

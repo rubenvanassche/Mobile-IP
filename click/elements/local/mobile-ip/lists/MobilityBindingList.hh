@@ -89,7 +89,25 @@ public:
     return out.str();
   }
 
-  bool has(MobilityBindingListItem* item);
+  bool isMobileBinded(IPAddress homeAddress){
+    for(auto it = this->mobilityBindings.begin();it != this->mobilityBindings.end();it++){
+      if(it->homeAddress == homeAddress){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  IPAddress getCareOfAddress(IPAddress homeAddress){
+    for(auto it = this->mobilityBindings.begin();it != this->mobilityBindings.end();it++){
+      if(it->homeAddress == homeAddress){
+        return it->careOfAddress;
+      }
+    }
+
+    return IPAddress("0.0.0.0");
+  }
 private:
   std::vector<MobilityBindingListItem> mobilityBindings;
 };

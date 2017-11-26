@@ -70,6 +70,16 @@ public:
 
     return false;
   }
+
+  bool isVisitor(IPAddress homeAddress){
+    for(auto it = this->visitors.begin();it != this->visitors.end();it++){
+      if(it->MNhome == homeAddress){
+        return true;
+      }
+    }
+
+    return false;
+  }
 private:
   std::vector<VisitorListItem> visitors;
 };

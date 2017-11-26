@@ -2,6 +2,9 @@
 #define CLICK_MOBILEIPDECAPSULATOR__HH
 
 #include <click/element.hh>
+#include "packets/PacketBuilders.hh"
+#include "packets/PacketProcessors.hh"
+#include "MobileIPForeignAgent.hh"
 
 CLICK_DECLS
 
@@ -15,11 +18,15 @@ class MobileIPDecapsulator : public Element {
 		MobileIPDecapsulator();
 		~MobileIPDecapsulator();
 
+		int configure(Vector<String> &conf, ErrorHandler *errh);
+
 		const char *class_name() const { return "MobileIPDecapsulator"; }
 		const char *port_count() const { return "1/2"; }
 		const char *processing() const { return AGNOSTIC; }
 
 		Packet *simple_action(Packet *p);
+
+		MobileIPForeignAgent* FA;
 };
 
 CLICK_ENDDECLS
