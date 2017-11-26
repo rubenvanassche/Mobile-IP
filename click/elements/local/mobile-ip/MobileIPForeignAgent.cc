@@ -83,8 +83,6 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			UDPIPfy(packet, this->careOfAddress, this->sourcePort, registration.homeAgent, 434, 1);
 
 			p->kill();
-
-
 		}
 
 		return;
@@ -179,8 +177,8 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 		// TODO Check if there are other devices in the subnet that send this request
 
 		// check if reserved fields are 0
-		if(registration.r != false){
-			this->sendReply(registration, 70);
+		if(registration.r != false  or registration.x != false){
+			this->sendReply(registration, 134);
 			return false;
 		}
 
@@ -199,6 +197,12 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 		// check if lifetime is accepted by this FA
 		if(registration.lifetime > this->maxAcceptedLifetime){
 			this->sendReply(registration, 69, this->maxAcceptedLifetime);
+			return false;
+		}
+
+		// Check if client wants to use a co-located address
+		if(registration.D == true){
+			this->sendReply(registration, 64);
 			return false;
 		}
 
