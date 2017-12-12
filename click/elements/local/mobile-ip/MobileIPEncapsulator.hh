@@ -9,7 +9,8 @@
 CLICK_DECLS
 
 // Input 0 -> all packages
-// Output 0 -> all packages + packages with MN that are not home are now tunneled
+// Output 0 -> all packages not tunneled
+// Output 1 -> packages tunneled, that should be send on the public network
 class MobileIPEncapsulator : public Element {
 	//TODO: Add private attributes
 
@@ -20,10 +21,10 @@ class MobileIPEncapsulator : public Element {
 		int configure(Vector<String> &conf, ErrorHandler *errh);
 
 		const char *class_name() const { return "MobileIPEncapsulator"; }
-		const char *port_count() const { return "1/1"; }
-		const char *processing() const { return AGNOSTIC; }
+		const char *port_count() const { return "1/2"; }
+		const char *processing() const { return PUSH; }
 
-		Packet *simple_action(Packet *p);
+		void push(int port, Packet *p);
 
 		MobileIPHomeAgent* HA;
 };

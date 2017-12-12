@@ -24,6 +24,12 @@ elementclass Agent {
 	// ARP responses are copied to each ARPQuerier and the host.
 	arpt :: Tee (2);
 
+	// MOBILE IP
+	mipadvertiser :: MobileIPAdvertiser(LINK_ADDRESS $private_address:ip, CAREOF_ADDRESS $public_address:ip, FA false, HA true);
+	mipagent :: MobileIPHomeAgent(PRIVATE_ADDRESS $private_address:ip, PUBLIC_ADDRESS $public_address:ip, FA_ADDRESS $gateway:ip);
+	mipEncap :: MobileIPEncapsulator(HA mipagent);
+
+
 	// Input and output paths for interface 0
 	input
 		-> HostEtherFilter($private_address)
@@ -64,6 +70,7 @@ elementclass Agent {
 		-> Strip(14)
 		-> CheckIPHeader
 		-> public_mipclass :: MobileIPClassifier
+		-> mipEncap
 		-> rt;
 
 
@@ -124,12 +131,10 @@ elementclass Agent {
 		-> rt;
 
 		// Advertise Mobile IP to clients on private network
-		mipadvertiser :: MobileIPAdvertiser(LINK_ADDRESS $private_address:ip, CAREOF_ADDRESS $public_address:ip, FA false, HA true);
 		Idle -> mipadvertiser; // Because we don't expect solicitations
 		mipadvertiser -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)  -> output;
 
 		// This is a home agent so act like one
-		mipagent :: MobileIPHomeAgent(PRIVATE_ADDRESS $private_address:ip, PUBLIC_ADDRESS $public_address:ip, FA_ADDRESS $gateway:ip);
 		mipagent[0] -> private_arpq;
 		mipagent[1] -> public_arpq;
 
@@ -144,4 +149,7 @@ elementclass Agent {
 		// Uneeded at this time
 		public_mipclass[3] -> Discard;
 		private_mipclass[3] -> Discard;
+
+		// Send tunneled packets on public network
+		mipEncap[1] -> [1]output;
 }

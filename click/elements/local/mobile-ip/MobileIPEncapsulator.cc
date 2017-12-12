@@ -16,16 +16,18 @@ int MobileIPEncapsulator::configure(Vector<String> &conf, ErrorHandler *errh) {
 		return 0;
 }
 
-Packet *MobileIPEncapsulator::simple_action(Packet *p) {
+void MobileIPEncapsulator::push(int port, Packet *p) {
 	IPHeader ip = processIPHeader(p);
 
 	if(this->HA->mobilityBindings.isMobileBinded(ip.destination)){
 		IPAddress destination = this->HA->mobilityBindings.getCareOfAddress(ip.destination);
 
 		buildTunnelIPPacket(p, this->HA->publicAddress, destination);
-	}
 
-	return p;
+		output(1).push(p);
+	}else{
+		output(0).push(p);
+	}
 };
 
 CLICK_ENDDECLS
