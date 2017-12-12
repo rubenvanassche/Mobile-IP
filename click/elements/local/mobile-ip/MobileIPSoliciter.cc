@@ -62,6 +62,7 @@ void MobileIPSoliciter::raiseLifetime(int seconds){
 void MobileIPSoliciter::move(){
 	this->connected = false;
 	this->routerAddress = IPAddress();
+	this->advertisementSequenceNumber = 0;
 
 	click_chatter("Node was moved");
 }
@@ -77,6 +78,7 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		this->routerAddress = advertisement.IP.source;
 		this->connected = true;
 		this->raiseLifetime(advertisement.lifetime);
+		this->advertisementSequenceNumber = advertisement.sequenceNumber;
 
 		this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
 
@@ -84,7 +86,15 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	}
 
 	if(this->routerAddress == advertisement.IP.source){
-		this->raiseLifetime(advertisement.lifetime);
+		if((advertisement.sequenceNumber - 1) != this->advertisementSequenceNumber and advertisement.sequenceNumber < 256){
+			// agent resetted itself
+			std::cout << "Agent resetted itself" << std::endl;
+			this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
+		}else{
+			this->advertisementSequenceNumber++;
+			this->raiseLifetime(advertisement.lifetime);
+		}
+
 		return NULL;
 	}
 

@@ -61,6 +61,9 @@ class MobileIPSoliciter : public Element {
 		// Send solicitations every x seconds, if 0 -> do not send
 		unsigned int solicitationInterval = 0;
 
+		// checks the advertisment sequence number for advertiser reset
+		unsigned int advertisementSequenceNumber = 0;
+
 		// Connection with the Mobile IP node
 		MobileIPNode* MN;
 };

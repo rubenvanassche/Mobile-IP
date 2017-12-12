@@ -34,8 +34,6 @@ class MobileIPAdvertiser : public Element {
 
 		Packet *simple_action(Packet *p);
 
-
-
 		// Send to multicast address
 		bool sendAdvertisement();
 		// Send to specified unicast address
@@ -50,8 +48,8 @@ class MobileIPAdvertiser : public Element {
 		bool isForeignAgent = false;
 
 		unsigned int sequenceNumber = 0;
-		unsigned int lifetime = 1800; // From RFC 1256
-		unsigned int registrationLifetime = 1800;
+		unsigned int lifetime = 5; // From RFC 1256
+		unsigned int registrationLifetime = 10;
 
 		IPAddress linkAddress;
 		IPAddress careOfAddress; // Only when FA
