@@ -159,6 +159,7 @@ registrationRequest processRegistrationRequestPacket(Packet* packet){
     structure.home = IPAddress(format->homeAddress);
     structure.homeAgent = IPAddress(format->homeAgent);
     structure.careOf = IPAddress(format->careOfAddress);
+    structure.identification = ntohl(format->identification2);
 
     structure.UDP = processUDPHeader(packet);
     structure.IP = processIPHeader(packet);
@@ -176,6 +177,7 @@ registrationReply processRegistrationReplyPacket(Packet* packet){
   structure.code = format->code;
   structure.home = IPAddress(format->homeAddress);
   structure.homeAgent = IPAddress(format->homeAgent);
+  structure.identification = ntohl(format->identification2);
 
   structure.UDP = processUDPHeader(packet);
   structure.IP = processIPHeader(packet);

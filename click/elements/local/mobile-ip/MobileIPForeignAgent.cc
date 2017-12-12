@@ -78,7 +78,7 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			this->requests.add(request);
 
 			// Now send the request to the home agent
-			WritablePacket* packet = buildRegistrationRequestPacket(registration.lifetime, registration.home, registration.homeAgent, this->careOfAddress);
+			WritablePacket* packet = buildRegistrationRequestPacket(registration.lifetime, registration.home, registration.homeAgent, this->careOfAddress, registration.identification);
 			UDPIPfy(packet, this->careOfAddress, this->sourcePort, registration.homeAgent, 434, 16);
 			output(1).push(packet);
 
@@ -139,7 +139,7 @@ void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned 
 		destination = IPAddress("255.255.255.255");
 	}
 
-	WritablePacket* packet = buildRegistrationReplyPacket(lifetime, code, registration.home, registration.homeAgent);
+	WritablePacket* packet = buildRegistrationReplyPacket(lifetime, code, registration.home, registration.homeAgent, registration.identification);
 	UDPIPfy(packet, source, 434, destination, registration.UDP.sourcePort, 1);
 
 	output(0).push(packet);
@@ -177,7 +177,7 @@ void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
 
 		// TODO Relay the reply(checking the RFC is needed)
 		// TODO set the right destination port
-		WritablePacket* packet = buildRegistrationReplyPacket(reply.lifetime, reply.code, reply.home, reply.homeAgent);
+		WritablePacket* packet = buildRegistrationReplyPacket(reply.lifetime, reply.code, reply.home, reply.homeAgent, reply.identification);
 		UDPIPfy(packet, this->privateAddress, 434, reply.home, 5584, 1);
 		output(0).push(packet);
 }

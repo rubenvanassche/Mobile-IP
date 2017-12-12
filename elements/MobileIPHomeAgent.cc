@@ -107,7 +107,7 @@ void MobileIPHomeAgent::sendReply(registrationRequest registration, unsigned int
 		}
 	}
 
-	WritablePacket* packet = buildRegistrationReplyPacket(lifetime, code, registration.home, registration.homeAgent);
+	WritablePacket* packet = buildRegistrationReplyPacket(lifetime, code, registration.home, registration.homeAgent, registration.identification);
 	UDPIPfy(packet, source, 434, destination, registration.UDP.sourcePort, 1);
 
 	output(port).push(packet);
@@ -136,7 +136,7 @@ bool MobileIPHomeAgent::checkForUnkwownHomeAgent(registrationRequest registratio
 		source = goToAddress;
 	}
 
-	WritablePacket* packet = buildRegistrationReplyPacket(this->maxAcceptedLifetime, 136, registration.home, this->publicAddress);
+	WritablePacket* packet = buildRegistrationReplyPacket(this->maxAcceptedLifetime, 136, registration.home, this->publicAddress, registration.identification);
 	UDPIPfy(packet, source, 434, destination, registration.UDP.sourcePort, 1);
 
 	output(port).push(packet);

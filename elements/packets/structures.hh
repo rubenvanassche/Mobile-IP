@@ -53,6 +53,7 @@ struct registrationRequest{
 
     UDPHeader UDP;
     IPHeader IP;
+    uint32_t identification;
 };
 
 struct registrationReply{
@@ -63,6 +64,7 @@ struct registrationReply{
 
     UDPHeader UDP;
     IPHeader IP;
+    uint32_t identification;
 };
 
 #endif

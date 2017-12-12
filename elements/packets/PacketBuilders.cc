@@ -214,7 +214,8 @@ WritablePacket* buildRegistrationRequestPacket(
         unsigned int lifetime,
         IPAddress home,
         IPAddress homeAgent,
-        IPAddress careOf
+        IPAddress careOf,
+        uint32_t identification
 ){
     int tailroom = 0;
     int packetsize = sizeof(registrationRequestPacket);
@@ -243,6 +244,15 @@ WritablePacket* buildRegistrationRequestPacket(
     format->homeAgent = homeAgent.in_addr();
     format->careOfAddress = careOf.in_addr();
 
+    // Set the identification
+    format->identification1 = htonl(Timestamp::now().subsec());
+    if(identification == 0){
+      format->identification2 = htonl(Timestamp::now_steady().subsec());
+    }else{
+      format->identification2 = htonl(identification);
+    }
+
+
     return packet;
 }
 
@@ -261,11 +271,14 @@ WritablePacket* buildRegistrationReplyPacket(
         unsigned int lifetime,
         uint8_t code,
         IPAddress home,
-        IPAddress homeAgent
+        IPAddress homeAgent,
+        uint32_t identification
 ){
   int tailroom = 0;
   int packetsize = sizeof(registrationReplyPacket);
   int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether) + 4;
+
+  std::cout << sizeof(uint64_t) << std::endl;
 
   WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
   if (packet == 0){
@@ -281,6 +294,9 @@ WritablePacket* buildRegistrationReplyPacket(
   format->lifetime = htons(lifetime);
   format->homeAddress = home.in_addr();
   format->homeAgent = homeAgent.in_addr();
+  format->identification1 = htonl(Timestamp::now().subsec());
+  format->identification2 = htonl(identification);
+
 
   return packet;
 }

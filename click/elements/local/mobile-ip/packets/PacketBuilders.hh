@@ -7,6 +7,8 @@
 
 #include "packets.hh"
 #include <click/packet.hh>
+#include <click/timestamp.hh>
+#include <sys/time.h>
 #include <clicknet/udp.h>
 #include <clicknet/ether.h>
 #include <iostream>
@@ -73,7 +75,8 @@ WritablePacket* buildRegistrationRequestPacket(
     unsigned int lifetime,
     IPAddress home,
     IPAddress homeAgent,
-    IPAddress careOf
+    IPAddress careOf,
+    uint32_t identification = 0
 );
 
 /**
@@ -83,7 +86,8 @@ WritablePacket* buildRegistrationReplyPacket(
     unsigned int lifetime,
     uint8_t code,
     IPAddress home,
-    IPAddress homeAgent
+    IPAddress homeAgent,
+    uint32_t identification
 );
 
 CLICK_ENDDECLS
