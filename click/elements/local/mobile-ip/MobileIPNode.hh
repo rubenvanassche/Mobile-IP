@@ -35,6 +35,8 @@ class MobileIPNode : public Element {
 		// Process a Reply
 		void processReply(registrationReply reply);
 
+		void sendRequest(IPAddress destination, IPAddress careOfAddress, unsigned int lifetime, unsigned int ttl = 1);
+
 		// Reregister a node when the node was moved
 		bool reregister(IPAddress address, IPAddress careOfAddress, unsigned int lifetime);
 

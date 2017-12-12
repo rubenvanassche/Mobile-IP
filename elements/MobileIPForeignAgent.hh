@@ -52,6 +52,9 @@ class MobileIPForeignAgent : public Element {
 		// Checks wheter the registration request packet is valid
 		bool checkRegistrationValidity(registrationRequest registration);
 
+		// Checks wheter the registration reply packet is valid
+		bool checkRegistrationValidity(registrationReply registration);
+
 		IPAddress publicAddress; // The public network address
 		IPAddress privateAddress; // The private network address
 		IPAddress careOfAddress; // The care of address provided by this FA

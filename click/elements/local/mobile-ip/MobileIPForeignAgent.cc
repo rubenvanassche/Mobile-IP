@@ -196,10 +196,15 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 
 		// check if reserved fields are 0
 		if(registration.r != false  or registration.x != false){
-			this->sendReply(registration, 134);
+			this->sendReply(registration, 70);
 			return false;
 		}
 
+		// Check the requested encapsulation
+		if(registration.M == true or registration.G == true){
+			this->sendReply(registration, 72);
+			return false;
+		}
 
 		// Check if there are too many pending requests
 		if(this->requests.size() >= this->maxPendingRegistrations){
@@ -214,10 +219,22 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 		}
 
 		// Check if client wants to use a co-located address
-		if(registration.D == true){
+		if(registration.D == true or registration.T == true){
 			this->sendReply(registration, 64);
 			return false;
 		}
+
+		return true;
+}
+
+bool MobileIPForeignAgent::checkRegistrationValidity(registrationReply registration){
+		// check if reserved fields are 0
+		/*
+		if(registration.r != false  or registration.x != false){
+			this->sendReply(registration, 71);
+			return false;
+		}
+		*/
 
 		return true;
 }
