@@ -31,8 +31,8 @@ elementclass Agent {
 
 	// Input and output paths for interface 0
 	input
-		-> HostEtherFilter($private_address)
 		-> private_class :: Classifier(12/0806 20/0001, 12/0806 20/0002, 12/0800)
+		-> HostEtherFilter($private_address)
 		-> ARPResponder($private_address)
 		-> output;
 
@@ -40,6 +40,7 @@ elementclass Agent {
 		-> output;
 
 	private_class[1]
+	 	-> HostEtherFilter($private_address)
 		-> arpt
 		-> [1]private_arpq;
 

@@ -38,7 +38,6 @@ elementclass Agent {
 		-> output;
 
 	private_arpq :: ARPQuerier($private_address)
-		-> ToDump("test.pcap")
 		-> output;
 
 	private_class[1]

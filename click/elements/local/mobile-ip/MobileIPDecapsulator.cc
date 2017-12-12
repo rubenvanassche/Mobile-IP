@@ -21,7 +21,6 @@ void MobileIPDecapsulator::push(int port, Packet *p) {
 		tunnelIP ipinip = processTunnelIPPacket(p, true);
 
 		if(this->FA->visitors.has(ipinip.originalIP.destination, ipinip.source)){
-
 			output(1).push(p);
 		}
 
