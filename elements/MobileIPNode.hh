@@ -26,9 +26,6 @@ class MobileIPNode : public Element {
 		int initialize(ErrorHandler *errh);
 		void add_handlers();
 
-		// Temp function for register request sender
-		static int registerHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
-
 		const char *class_name() const { return "MobileIPNode"; }
 		const char *port_count() const { return "1/1"; }
 		const char *processing() const { return PUSH; }
@@ -39,13 +36,13 @@ class MobileIPNode : public Element {
 		void processReply(registrationReply reply);
 
 		// Reregister a node when the node was moved
-		bool reregister(IPAddress address, unsigned int lifetime);
+		bool reregister(IPAddress address, IPAddress careOfAddress, unsigned int lifetime);
 
 		// Register by Link-Layer protocol
 		bool registerLL();
 
 		// Register with a given Foreign Agent
-		bool registerFA(IPAddress FAAddress, unsigned int lifetime);
+		bool registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsigned int lifetime);
 
 		// Register with the home Agent
 		bool registerHA(unsigned int lifetime);

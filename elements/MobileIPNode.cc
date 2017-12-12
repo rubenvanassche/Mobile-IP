@@ -27,23 +27,9 @@ int MobileIPNode::initialize(ErrorHandler *) {
     return 0;
 }
 
-int MobileIPNode::registerHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh){
-		MobileIPNode* me = (MobileIPNode*) e;
-
-		int lifetime;
-		IPAddress address;
-		if(Args(errh).push_back_args(conf).read_m("IP", address).read_m("LT", lifetime).complete() < 0){
-				return -1;
-		}
-
-		me->reregister(address, lifetime);
-
-		return 0;
-}
-
 
 void MobileIPNode::add_handlers(){
-		add_write_handler("register", &registerHandler, (void *)0);
+		
 }
 
 void MobileIPNode::run_timer(Timer *timer) {
@@ -119,14 +105,14 @@ void MobileIPNode::processReply(registrationReply reply){
 	}
 }
 
-bool MobileIPNode::reregister(IPAddress address, unsigned int lifetime){
+bool MobileIPNode::reregister(IPAddress address, IPAddress careOfAddress, unsigned int lifetime){
 	this->connected = false;
 
 	if(this->homeAgentPrivateAddress == address){
 		// TODO should delete registration with FA
 		//this->registerHA(lifetime);
 	}else{
-		this->registerFA(address, lifetime);
+		this->registerFA(address, careOfAddress, lifetime);
 	}
 }
 
@@ -147,8 +133,8 @@ bool MobileIPNode::registerLL(){
 	output(0).push(packet);
 }
 
-bool MobileIPNode::registerFA(IPAddress FAAddress, unsigned int lifetime){
-  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
+bool MobileIPNode::registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsigned int lifetime){
+  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, careOfAddress);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, FAAddress, 434, 1);
 
 	RequestListItem r;

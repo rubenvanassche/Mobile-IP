@@ -49,7 +49,6 @@ void MobileIPSoliciter::move(){
 
 Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	if(getPacketType(p) != ADVERTISEMENT){
-		// TODO Send broadcast packets through to the link so other systems of the router can use it
 		return NULL;
 	}
 
@@ -60,9 +59,7 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		this->connected = true;
 		this->raiseLifetime(advertisement.lifetime);
 
-		// TODO: Register using Mobile IP
-		this->MN->reregister(advertisement.IP.source, advertisement.lifetime);
-
+		this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
 
 		return NULL;
 	}
