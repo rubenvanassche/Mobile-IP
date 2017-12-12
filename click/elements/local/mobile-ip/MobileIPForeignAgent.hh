@@ -25,6 +25,8 @@ class MobileIPForeignAgent : public Element {
 
 		int configure(Vector<String> &conf, ErrorHandler *errh);
 		int initialize(ErrorHandler *errh);
+
+		static String getVisitorsHandler(Element *e, void * thunk);
 		void add_handlers();
 
 		const char *class_name() const { return "MobileIPForeignAgent"; }

@@ -96,14 +96,22 @@ IPHeader processIPHeader(Packet* packet){
 
 tunnelIP processTunnelIPPacket(Packet* packet, bool stripIPHeader){
     tunnelIP structure;
-    click_ip* format = (click_ip*)(packet->data());
+    click_ip* ipinip = (click_ip*)(packet->data());
+    click_ip* ip = (click_ip*)(packet->data() + sizeof(click_ip));
 
-    structure.source = IPAddress(format->ip_src);
-    structure.destination = IPAddress(format->ip_dst);
-    structure.ttl = format->ip_ttl;
+    structure.source = IPAddress(ipinip->ip_src);
+    structure.destination = IPAddress(ipinip->ip_dst);
+    structure.ttl = ipinip->ip_ttl;
+
+    structure.originalIP.source = IPAddress(ip->ip_src);
+    structure.originalIP.destination = IPAddress(ip->ip_dst);
 
     if(stripIPHeader == true){
       packet->pull(sizeof(click_ip));
+      ip = (click_ip*)(packet->data());
+
+      packet->set_ip_header(ip, sizeof(click_ip));
+      packet->set_dst_ip_anno(structure.originalIP.destination.in_addr());
     }
 
     return structure;

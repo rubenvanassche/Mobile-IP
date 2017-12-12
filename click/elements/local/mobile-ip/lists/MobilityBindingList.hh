@@ -70,6 +70,7 @@ public:
       if(it->remainingLifetime != 0){
         it++;
       }else{
+        std::cout << "MB removed " << it->homeAddress.s().c_str() << std::endl;
         it = this->mobilityBindings.erase(it);
       }
     }

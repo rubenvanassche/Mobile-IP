@@ -82,14 +82,14 @@ WritablePacket* StripUDPIPHeader(WritablePacket* packet){
   packet->pull(sizeof(click_udp) + sizeof(click_ip));
 }
 
-Packet* buildTunnelIPPacket(
+WritablePacket* buildTunnelIPPacket(
     Packet* originalPacket,
     IPAddress source,
     IPAddress destination
 ){
   int tailroom = 0;
   int packetsize = originalPacket->length() + sizeof(click_ip);
-  int headroom =  sizeof(click_ether);
+  int headroom =  sizeof(click_ether) + 4;
 
   WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
   if (packet == 0){
@@ -277,8 +277,6 @@ WritablePacket* buildRegistrationReplyPacket(
   int tailroom = 0;
   int packetsize = sizeof(registrationReplyPacket);
   int headroom = sizeof(click_udp) + sizeof(click_ip) + sizeof(click_ether) + 4;
-
-  std::cout << sizeof(uint64_t) << std::endl;
 
   WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
   if (packet == 0){

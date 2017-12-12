@@ -7,6 +7,8 @@
 
 #include <click/ipaddress.hh>
 #include <vector>
+#include <string>
+#include <sstream>
 
 struct VisitorListItem{
   IPAddress MNsource;
@@ -34,7 +36,10 @@ public:
   }
 
   VisitorListItem* find(IPAddress homeAddress, IPAddress homeAgent);
-  void add(VisitorListItem item);
+
+  void add(VisitorListItem item){
+    this->visitors.push_back(item);
+  }
 
   bool setVisitorRemainingLifetime(IPAddress homeAddress, IPAddress homeAgentAddress, unsigned int lifetime){
     for(auto it = this->visitors.begin();it != this->visitors.end();){
@@ -69,6 +74,22 @@ public:
     }
 
     return false;
+  }
+
+  std::string print(){
+    std::stringstream out;
+    out << "--------------------------------\n";
+    for(auto it = this->visitors.begin();it != this->visitors.end();it++){
+      out << "MN: " << it->MNhome.s().c_str();
+      out <<  "   ";
+      out << "HA: " << it->MNhomeAgent.s().c_str();
+      out <<  "   ";
+      out <<  it->remainingLifetime;
+      out << "\n";
+    }
+    out << "--------------------------------\n";
+
+    return out.str();
   }
 
   bool isVisitor(IPAddress homeAddress){

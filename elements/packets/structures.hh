@@ -21,6 +21,7 @@ struct tunnelIP{
     IPAddress source;
     IPAddress destination;
     unsigned int ttl;
+    IPHeader originalIP;
 };
 
 struct routerAdvertisement{

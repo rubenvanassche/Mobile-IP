@@ -21,10 +21,10 @@ void MobileIPEncapsulator::push(int port, Packet *p) {
 
 	if(this->HA->mobilityBindings.isMobileBinded(ip.destination)){
 		IPAddress destination = this->HA->mobilityBindings.getCareOfAddress(ip.destination);
+		WritablePacket* packet = buildTunnelIPPacket(p, this->HA->publicAddress, destination);
 
-		buildTunnelIPPacket(p, this->HA->publicAddress, destination);
-
-		output(1).push(p);
+		output(1).push(packet);
+		p->kill();
 	}else{
 		output(0).push(p);
 	}

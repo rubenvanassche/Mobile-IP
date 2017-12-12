@@ -38,6 +38,7 @@ elementclass Agent {
 		-> output;
 
 	private_arpq :: ARPQuerier($private_address)
+		-> ToDump("test.pcap")
 		-> output;
 
 	private_class[1]
@@ -151,5 +152,5 @@ elementclass Agent {
 		private_mipclass[3] -> Discard;
 
 		// Send tunneled packets on public network
-		mipEncap[1] -> [1]output;
+		mipEncap[1] -> public_arpq;
 }

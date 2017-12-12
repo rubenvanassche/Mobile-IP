@@ -37,8 +37,13 @@ void MobileIPHomeAgent::run_timer(Timer *timer) {
     mobilityBindingListTimer.reschedule_after_sec(1);
 }
 
+String MobileIPHomeAgent::getMobilityBindingsHandler(Element *e, void * thunk){
+		MobileIPHomeAgent * me = (MobileIPHomeAgent *) e;
+		return me->mobilityBindings.print().c_str();
+}
+
 void MobileIPHomeAgent::add_handlers(){
-		//add_write_handler("set_lifetime", &changeLifetimeHandler, (void *)0);
+		add_read_handler("mobility_bindings", &getMobilityBindingsHandler, (void *)0);
 }
 
 void MobileIPHomeAgent::push(int port, Packet *p) {

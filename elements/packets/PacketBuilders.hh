@@ -45,7 +45,7 @@ WritablePacket* StripUDPIPHeader(WritablePacket* packet);
 /**
  * Adds an tunnel for an given IP packet, creates a new packet
  */
-Packet* buildTunnelIPPacket(
+WritablePacket* buildTunnelIPPacket(
     Packet* packet,
     IPAddress source,
     IPAddress destination

@@ -43,8 +43,13 @@ void MobileIPForeignAgent::run_timer(Timer *timer) {
     requestsTimer.reschedule_after_sec(1);
 }
 
+String MobileIPForeignAgent::getVisitorsHandler(Element *e, void * thunk){
+		MobileIPForeignAgent * me = (MobileIPForeignAgent *) e;
+		return me->visitors.print().c_str();
+}
+
 void MobileIPForeignAgent::add_handlers(){
-		//add_write_handler("set_lifetime", &changeLifetimeHandler, (void *)0);
+		add_read_handler("visitors", &getVisitorsHandler, (void *)0);
 }
 
 void MobileIPForeignAgent::push(int port, Packet *p) {
@@ -122,7 +127,6 @@ void MobileIPForeignAgent::sendRequestTimedOutReply(std::vector<RequestListItem>
 		}
 }
 
-
 void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned int code){
 	this->sendReply(registration, code, registration.lifetime);
 }
@@ -175,6 +179,8 @@ void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
 						visitor.UDPSourcePort = request.rr.UDP.sourcePort;
 						visitor.requestedLifetime = remainingLifetime;
 						visitor.remainingLifetime = remainingLifetime;
+
+						this->visitors.add(visitor);
 					}
 				}
 		}

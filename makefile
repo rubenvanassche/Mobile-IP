@@ -29,3 +29,12 @@ th:
 
 tf:
 	cd click/scripts; ./to_foreign.sh
+
+appMN:
+	cd click/apps/ClickController; java ClickController localhost 10001
+
+appHA:
+	cd click/apps/ClickController; java ClickController localhost 10002
+
+appFA:
+	cd click/apps/ClickController; java ClickController localhost 10003

@@ -24,6 +24,11 @@ elementclass Agent {
 	// ARP responses are copied to each ARPQuerier and the host.
 	arpt :: Tee (2);
 
+	// Mobile IP
+	mipadvertiser :: MobileIPAdvertiser(LINK_ADDRESS $private_address:ip, CAREOF_ADDRESS $public_address:ip, FA true, HA false);
+	mipagent :: MobileIPForeignAgent(PRIVATE_ADDRESS $private_address:ip, PUBLIC_ADDRESS $public_address:ip, HA_ADDRESS $gateway:ip);
+	mipdec :: MobileIPDecapsulator(FA mipagent);
+
 	// Input and output paths for interface 0
 	input
 		-> HostEtherFilter($private_address)
@@ -124,12 +129,10 @@ elementclass Agent {
 		-> rt;
 
 		// Advertise Mobile IP to clients on private network
-		mipadvertiser :: MobileIPAdvertiser(LINK_ADDRESS $private_address:ip, CAREOF_ADDRESS $public_address:ip, FA true, HA false);
 		Idle -> mipadvertiser; // Because we don't expect solicitations
 		mipadvertiser -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)  -> output;
 
 		// This is a home agent so act like one
-		mipagent :: MobileIPForeignAgent(PRIVATE_ADDRESS $private_address:ip, PUBLIC_ADDRESS $public_address:ip, HA_ADDRESS $gateway:ip);
 		mipagent[0] -> private_arpq;
 		mipagent[1] -> public_arpq;
 
@@ -141,7 +144,13 @@ elementclass Agent {
 		private_mipclass[2] -> Discard; // Only replies from public network possible
 		public_mipclass[2] -> [1]mipagent;
 
-		// Uneeded at this time
-		public_mipclass[3] -> Discard;
-		private_mipclass[3] -> Discard;
+		// Send ip in ip packets to decapsulator
+		public_mipclass[3] -> mipdec;
+		private_mipclass[3] -> mipdec;
+
+		// Send packets with ip in ip tunneling stripped to the private network
+		mipdec[1] -> private_arpq;
+
+		// Discard not ip in ip
+		mipdec->Discard;
 }

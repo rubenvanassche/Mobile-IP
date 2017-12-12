@@ -48,7 +48,7 @@ class MobileIPAdvertiser : public Element {
 		bool isForeignAgent = false;
 
 		unsigned int sequenceNumber = 0;
-		unsigned int lifetime = 3; // From RFC 1256
+		unsigned int lifetime = 10; // From RFC 1256
 		unsigned int registrationLifetime = 10;
 
 		IPAddress linkAddress;

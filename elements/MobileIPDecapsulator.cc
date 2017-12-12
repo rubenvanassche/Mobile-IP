@@ -16,13 +16,18 @@ int MobileIPDecapsulator::configure(Vector<String> &conf, ErrorHandler *errh) {
 		return 0;
 }
 
-Packet *MobileIPDecapsulator::simple_action(Packet *p) {
+void MobileIPDecapsulator::push(int port, Packet *p) {
 	if(getPacketType(p) == IPINIP){
-		IPHeader ip = processIPHeader(p);
+		tunnelIP ipinip = processTunnelIPPacket(p, true);
 
+		if(this->FA->visitors.has(ipinip.originalIP.destination, ipinip.source)){
+			output(1).push(p);
+		}
+
+		// If not in visitor list, ignore
+	}else{
+		output(0).push(p);
 	}
-
-	return p;
 };
 
 CLICK_ENDDECLS
