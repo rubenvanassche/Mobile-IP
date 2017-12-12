@@ -131,8 +131,10 @@ elementclass Agent {
 		-> rt;
 
 		// Advertise Mobile IP to clients on private network
-		Idle -> mipadvertiser; // Because we don't expect solicitations
 		mipadvertiser -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)  -> output;
+		public_mipclass[4] -> mipadvertiser;
+		private_mipclass[4] -> mipadvertiser;
+
 
 		// This is a home agent so act like one
 		mipagent[0] -> private_arpq;

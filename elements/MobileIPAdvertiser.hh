@@ -23,6 +23,9 @@ class MobileIPAdvertiser : public Element {
 
 		int configure(Vector<String> &conf, ErrorHandler *errh);
 		int initialize(ErrorHandler *errh);
+
+		// HANDLER for changing the lifetime
+		static int changeLifetimeHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
 		void add_handlers();
 
 		const char *class_name() const { return "MobileIPAdvertiser"; }
@@ -31,8 +34,7 @@ class MobileIPAdvertiser : public Element {
 
 		Packet *simple_action(Packet *p);
 
-		// HANDLER for changing the lifetime
-		static int changeLifetimeHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
+
 
 		// Send to multicast address
 		bool sendAdvertisement();
@@ -48,8 +50,8 @@ class MobileIPAdvertiser : public Element {
 		bool isForeignAgent = false;
 
 		unsigned int sequenceNumber = 0;
-		unsigned int lifetime = 3; // From RFC 1256
-		unsigned int registrationLifetime = 10;
+		unsigned int lifetime = 1800; // From RFC 1256
+		unsigned int registrationLifetime = 1800;
 
 		IPAddress linkAddress;
 		IPAddress careOfAddress; // Only when FA

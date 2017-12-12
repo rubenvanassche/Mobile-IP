@@ -182,7 +182,7 @@ WritablePacket* buildRouterAdvertisementMessage(
 WritablePacket* buildRouterSolicitationMessage(){
   int tailroom = 0;
   int packetsize = sizeof(routerSolicitationMessage);
-  int headroom = sizeof(click_ip) + sizeof(click_ether);
+  int headroom = sizeof(click_ip) + sizeof(click_ether) + 4;
 
   WritablePacket *packet = Packet::make(headroom, 0, packetsize, tailroom);
   if (packet == 0){

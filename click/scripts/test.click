@@ -1,20 +1,14 @@
-//s :: MobileIPAgent;
-//s -> d ->  EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test.pcap");
-//ICMPPingSource(192.168.1.2, 198.1.32.2) -> s;
-
-m :: MobileIPNode(HOME_ADDRESS 192.168.1.2, HA_ADDRESS 198.1.32.2);
-f :: MobileIPForeignAgent(PUBLIC_ADDRESS 192.168.1.1, PRIVATE_ADDRESS 192.168.1.2, HA_ADDRESS 192.168.2.1);
-h :: MobileIPHomeAgent(PUBLIC_ADDRESS 192.168.2.1, PRIVATE_ADDRESS 192.168.2.2, FA_ADDRESS 192.168.1.1);
-a :: MobileIPAdvertiser(LINK_ADDRESS 192.165.2.1, HA 1);
-s :: MobileIPSoliciter(LINK_ADDRESS 192.165.2.2, MN m);
-
-a ->  EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test.pcap") -> Strip(14) -> s;
-s ->  EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test1.pcap") -> Strip(14) -> a;
-
-f[1] -> [1]h;
-h[1] -> [1]f;
-m -> [0]f;
-f[0] -> EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test2.pcap") -> Strip(14) -> m;
-
-h[0] -> Discard;
-Idle -> [0]h
+mn :: MobileIPNode(HOME_ADDRESS 1.2.3.4, HA_PRIVATE_ADDRESS 1.2.3.4, HA_PUBLIC_ADDRESS 1.2.3.4);
+Idle -> mn;
+mn -> Discard;
+adv :: MobileIPSoliciter(LINK_ADDRESS 192.168.1.1,MN mn);
+//adv :: MobileIPAdvertiser(LINK_ADDRESS 192.168.1.1, CAREOF_ADDRESS 192.168.1.1, HA true);
+cl :: MobileIPClassifier();
+Idle -> adv;
+//adv ->   EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test.pcap") -> Strip(14)-> cl;
+adv -> ToDump("test.pcap") -> cl;
+cl -> Discard;
+cl[1] -> Discard;
+cl[2] -> Discard;
+cl[3] -> Discard;
+cl[4] -> Discard;

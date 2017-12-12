@@ -31,9 +31,28 @@ void MobileIPSoliciter::run_timer(Timer *timer) {
 
 		if(timer == &solicitationTimer){
 			this->sendSolicitation();
+			timer->reschedule_after_sec(this->solicitationInterval);
 			return;
 		}
 
+}
+
+void MobileIPSoliciter::add_handlers(){
+		add_write_handler("set_solicitation_interval", &changeSolicitationIntervalHandler, (void *)0);
+}
+
+
+int MobileIPSoliciter::changeSolicitationIntervalHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh){
+		MobileIPSoliciter* me = (MobileIPSoliciter*) e;
+
+		int seconds;
+		if(Args(errh).push_back_args(conf).read("SECONDS", seconds).complete() < 0){
+				return -1;
+		}
+
+		me->changeSolicitationInterval(seconds);
+
+		return 0;
 }
 
 void MobileIPSoliciter::raiseLifetime(int seconds){
@@ -71,6 +90,16 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 
 	return NULL;
 };
+
+void MobileIPSoliciter::changeSolicitationInterval(unsigned int seconds){
+	this->solicitationInterval = seconds;
+
+	if(seconds == 0){
+		this->solicitationTimer.unschedule();
+	}else{
+		this->solicitationTimer.schedule_now();
+	}
+}
 
 bool MobileIPSoliciter::sendSolicitation(){
 	this->sendSolicitation(IPAddress("255.255.255.255"));

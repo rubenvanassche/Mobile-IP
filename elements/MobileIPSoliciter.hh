@@ -23,11 +23,18 @@ class MobileIPSoliciter : public Element {
 		int configure(Vector<String> &conf, ErrorHandler *errh);
 		int initialize(ErrorHandler *errh);
 
+		// HANDLER for changing the solicitation interval
+		static int changeSolicitationIntervalHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
+		void add_handlers();
+
 		const char *class_name() const { return "MobileIPSoliciter"; }
 		const char *port_count() const { return "1/1"; }
 		const char *processing() const { return AGNOSTIC; }
 
 		Packet *simple_action(Packet *p);
+
+		// Starts sending solicitaions or stops every x seconds
+		void changeSolicitationInterval(unsigned int seconds);
 
 		void run_timer(Timer *timer);
 
@@ -50,6 +57,9 @@ class MobileIPSoliciter : public Element {
 		// tracks how many seconds remain before the lifetime from the latest router advertisement ends
 		Timer lifetimeTimer;
 		Timer solicitationTimer;
+
+		// Send solicitations every x seconds, if 0 -> do not send
+		unsigned int solicitationInterval = 0;
 
 		// Connection with the Mobile IP node
 		MobileIPNode* MN;

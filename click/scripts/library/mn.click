@@ -63,7 +63,7 @@ elementclass MobileNode {
 
 	// Get solicitations
 	mipsoliciter :: MobileIPSoliciter(LINK_ADDRESS $address:ip, MN mipnode);
-	mipsoliciter -> Discard; // ignore solicitations at this time
+	mipsoliciter -> arpq; // ignore solicitations at this time
 	rt[2] -> mipsoliciter; // addresses on 255.255.255.255
 
 	// We don't expect resgistrations requests
@@ -71,5 +71,8 @@ elementclass MobileNode {
 
 	// Decapsulate IPinIP
 	mipclass[3] -> Discard;
+
+	// We don't expect solicitations
+	mipclass[4] -> Discard;
 
 }

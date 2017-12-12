@@ -58,7 +58,6 @@ void MobileIPAdvertiser::resetAdvertisementTimer(int seconds){
 		this->lifetime = seconds;
 
 		int next = ceil(this->lifetime/3)*1000 - (rand() % 100);
-		std::cout << next << std::endl;
 		advertisementTimer.schedule_after_msec(next);
 }
 
@@ -75,7 +74,7 @@ void MobileIPAdvertiser::run_timer(Timer *timer) {
 Packet* MobileIPAdvertiser::simple_action(Packet *p) {
 	try{
 		routerSolicitation r = processRouterSolicitationMessage(p);
-		this->sendAdvertisement(r.IP.source);
+		this->sendAdvertisement();
 	}catch(ZeroChecksumException &e){
 		click_chatter("Zero Checksum in Router Solicitation");
 	}catch(InvalidChecksumException &e){

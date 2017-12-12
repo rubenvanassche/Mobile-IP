@@ -12,8 +12,8 @@ copy:
 app:
 	cd click/apps/ClickController; java ClickController localhost 1981
 
-test:
-	cd click/scripts; ../userlevel/click test.click -p 1981
+test: build
+	cd click/scripts; sudo ../userlevel/click test.click -p 1981
 
 debug:
 	cd click/scripts;  gdb ../userlevel/click
@@ -38,3 +38,6 @@ appHA:
 
 appFA:
 	cd click/apps/ClickController; java ClickController localhost 10003
+
+appTest:
+	cd click/apps/ClickController; java ClickController localhost 1981

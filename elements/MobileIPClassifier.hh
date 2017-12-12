@@ -14,6 +14,7 @@ CLICK_DECLS
  * Output 1 -> registration requests
  * Output 2 -> registration replies
  * Output 3 -> IPinIP tunneling
+ * Output 4 -> router solicitation
  */
 class MobileIPClassifier : public Element {
 	//TODO: Add private attributes
@@ -23,7 +24,7 @@ class MobileIPClassifier : public Element {
 		~MobileIPClassifier();
 
 		const char *class_name() const { return "MobileIPClassifier"; }
-		const char *port_count() const { return "1/4"; }
+		const char *port_count() const { return "1/5"; }
 		const char *processing() const { return PUSH; }
 
 		void push(int port, Packet *p);

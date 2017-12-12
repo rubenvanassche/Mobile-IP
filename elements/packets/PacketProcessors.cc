@@ -11,9 +11,9 @@ PacketType getPacketType(Packet* packet){
       return UNKOWN;
     }
 
-    click_ip* format = (click_ip*)(packet->network_header());
+    click_ip* ipType = (click_ip*)(packet->network_header());
 
-    if(format->ip_p == IP_PROTO_ICMP){
+    if(ipType->ip_p == IP_PROTO_ICMP){
       unsigned int offset = sizeof(click_ip);
       routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset);
 
@@ -24,9 +24,9 @@ PacketType getPacketType(Packet* packet){
       }else{
         return UNKOWN;
       }
-    }else if(format->ip_p == IP_PROTO_IPIP){
+    }else if(ipType->ip_p == IP_PROTO_IPIP){
       return IPINIP;
-    }else if(format->ip_p == IP_PROTO_UDP){
+    }else if(ipType->ip_p == IP_PROTO_UDP){
       unsigned int offset = sizeof(click_ip) + sizeof(click_udp);
       registrationReplyPacket* format = (registrationReplyPacket*)(packet->data() + offset);
 
