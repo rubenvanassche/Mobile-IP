@@ -73,6 +73,7 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			request.careOfAddress = this->careOfAddress;
 			request.requestedLifetime = registration.lifetime;
 			request.remainingLifetime = registration.lifetime;
+			request.identification = registration.identification;
 			request.rr = registration;
 
 			this->requests.add(request);
@@ -146,6 +147,14 @@ void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned 
 }
 
 void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
+		RequestListItem request;
+		try{
+			request = this->requests.remove(reply.identification);
+		}catch(RequestNotFoundException &e){
+			// Captured an reply to an request we haven't
+			return;
+		}
+
 		if(reply.code == 0 or reply.code == 1){
 				// Home agent accepted
 				if(reply.lifetime == 0){
@@ -160,25 +169,19 @@ void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
 					}else{
 						// Add a new visitor
 						VisitorListItem visitor;
+						visitor.MNsource = request.rr.IP.source;
 						visitor.MNhome = reply.home;
 						visitor.MNhomeAgent = reply.homeAgent;
+						visitor.UDPSourcePort = request.rr.UDP.sourcePort;
 						visitor.requestedLifetime = remainingLifetime;
 						visitor.remainingLifetime = remainingLifetime;
-
-						// TODO some fields are connected to a request, we need this information
 					}
 				}
 		}
 
-		// TODO how to determine that this reply replies to a specified request? Now implemented with homeAddress and homeAgentAddress
-		// But that doesn't seems right, better working with data givven in registration like care-of address and so
-		// Needs to be investigated
-		this->requests.remove(reply.home, reply.homeAgent);
-
 		// TODO Relay the reply(checking the RFC is needed)
-		// TODO set the right destination port
 		WritablePacket* packet = buildRegistrationReplyPacket(reply.lifetime, reply.code, reply.home, reply.homeAgent, reply.identification);
-		UDPIPfy(packet, this->privateAddress, 434, reply.home, 5584, 1);
+		UDPIPfy(packet, this->privateAddress, 434, reply.home, request.rr.UDP.sourcePort, 1);
 		output(0).push(packet);
 }
 

@@ -29,7 +29,7 @@ int MobileIPNode::initialize(ErrorHandler *) {
 
 
 void MobileIPNode::add_handlers(){
-		
+
 }
 
 void MobileIPNode::run_timer(Timer *timer) {
@@ -119,6 +119,8 @@ bool MobileIPNode::reregister(IPAddress address, IPAddress careOfAddress, unsign
 bool MobileIPNode::registerLL(){
 	int lifetime = 1800;
 
+	unsigned int identification = Timestamp::now_steady().subsec();
+
   WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, IPAddress("224.0.0.11"), 434, 1);
 
@@ -127,6 +129,7 @@ bool MobileIPNode::registerLL(){
 	r.careOfAddress = this->careOfAddress;
 	r.requestedLifetime = lifetime;
 	r.remainingLifetime = lifetime;
+	r.identification = identification;
 	this->requests.add(r);
 
 
@@ -134,7 +137,9 @@ bool MobileIPNode::registerLL(){
 }
 
 bool MobileIPNode::registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsigned int lifetime){
-  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, careOfAddress);
+	unsigned int identification = Timestamp::now_steady().subsec();
+
+  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, careOfAddress, identification);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, FAAddress, 434, 1);
 
 	RequestListItem r;
@@ -142,14 +147,17 @@ bool MobileIPNode::registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsi
 	r.careOfAddress = this->careOfAddress;
 	r.requestedLifetime = lifetime;
 	r.remainingLifetime = lifetime;
+	r.identification = identification;
 	this->requests.add(r);
 
 	output(0).push(packet);
 }
 
 bool MobileIPNode::registerHA(unsigned int lifetime){
+	unsigned int identification = Timestamp::now_steady().subsec();
+
 	// Set ttl to 16 because why not?
-  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
+  WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress, identification);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, this->homeAgentPrivateAddress, 434, 16);
 
 	RequestListItem r;
@@ -157,15 +165,17 @@ bool MobileIPNode::registerHA(unsigned int lifetime){
 	r.careOfAddress = this->careOfAddress;
 	r.requestedLifetime = lifetime;
 	r.remainingLifetime = lifetime;
+	r.identification = identification;
 	this->requests.add(r);
 
 	output(0).push(packet);
 }
 
 bool MobileIPNode::deregister(IPAddress FAAddress){
+	unsigned int identification = Timestamp::now_steady().subsec();
 	int lifetime = 0;
 
-	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->homeAddress);
+	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->homeAddress, identification);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, FAAddress, 434, 1);
 
 	RequestListItem r;
@@ -173,15 +183,17 @@ bool MobileIPNode::deregister(IPAddress FAAddress){
 	r.careOfAddress = this->careOfAddress;
 	r.requestedLifetime = lifetime;
 	r.remainingLifetime = lifetime;
+	r.identification = identification;
 	this->requests.add(r);
 
 	output(0).push(packet);
 }
 
 bool MobileIPNode::deregister(IPAddress FAAddress, IPAddress address){
+	unsigned int identification = Timestamp::now_steady().subsec();
 	int lifetime = 0;
 
-	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress);
+	WritablePacket* packet = buildRegistrationRequestPacket(lifetime, this->homeAddress, this->homeAgentPublicAddress, this->careOfAddress, identification);
 	UDPIPfy(packet, this->homeAddress, this->sourcePort, FAAddress, 434, 1);
 
 	RequestListItem r;
@@ -189,6 +201,7 @@ bool MobileIPNode::deregister(IPAddress FAAddress, IPAddress address){
 	r.careOfAddress = this->careOfAddress;
 	r.requestedLifetime = lifetime;
 	r.remainingLifetime = lifetime;
+	r.identification = identification;
 	this->requests.add(r);
 
 	output(0).push(packet);

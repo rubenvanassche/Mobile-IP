@@ -57,7 +57,7 @@ class MobileIPForeignAgent : public Element {
 
 		unsigned int maxPendingRegistrations = 5; // The maximal amount of registrations
 		unsigned int maxAcceptedLifetime = 1800; // The maximal lifetime this FA is accepting
-		unsigned int sourcePort = 5241;
+		unsigned int sourcePort = 3581;
 
 		// The timer tracking the current requests
 		Timer requestsTimer;

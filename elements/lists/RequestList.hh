@@ -7,12 +7,14 @@
 
 #include <click/ipaddress.hh>
 #include "../packets/structures.hh"
+#include "../exceptions/RequestNotFoundException.hh"
 #include <vector>
 #include <iostream>
 
 struct RequestListItem{
   IPAddress destination;
   IPAddress careOfAddress;
+  unsigned int identification;
 
   // Only for FA
   registrationRequest rr;
@@ -27,14 +29,18 @@ public:
   RequestList(){};
   ~RequestList(){};
 
-  bool remove(IPAddress homeAddress, IPAddress homeAgentAddress){
+  RequestListItem remove(unsigned int identification){
     for(auto it = this->requests.begin();it != this->requests.end();){
-      if(it->rr.home == homeAddress and it->rr.homeAgent == homeAgentAddress){
+      if(it->identification == identification){
+        RequestListItem out = *it;
         it = this->requests.erase(it);
+        return out;
       }else{
         it++;
       }
     }
+
+    throw RequestNotFoundException("identification");
   }
 
   void decreaseLifetime(){
