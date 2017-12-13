@@ -110,6 +110,13 @@ tunnelIP processTunnelIPPacket(Packet* packet, bool stripIPHeader){
       packet->pull(sizeof(click_ip));
       ip = (click_ip*)(packet->data());
 
+      // Set ttl
+      ip->ip_ttl = structure.ttl;
+
+      // Recalculate the Checksum
+      ip->ip_sum = 0;
+      ip->ip_sum = click_in_cksum((unsigned char *)ip, sizeof(click_ip));
+
       packet->set_ip_header(ip, sizeof(click_ip));
       packet->set_dst_ip_anno(structure.originalIP.destination.in_addr());
     }

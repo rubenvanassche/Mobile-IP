@@ -151,7 +151,7 @@ elementclass Agent {
 		private_mipclass[3] -> mipdec;
 
 		// Send packets with ip in ip tunneling stripped to the private network
-		mipdec[1] -> private_arpq;
+		mipdec[1] -> DecIPTTL() -> private_arpq;
 
 		// Discard not ip in ip
 		mipdec->Discard;

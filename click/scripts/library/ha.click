@@ -153,5 +153,5 @@ elementclass Agent {
 		private_mipclass[3] -> Discard;
 
 		// Send tunneled packets on public network
-		mipEncap[1] -> public_arpq;
+		mipEncap[1] -> DecIPTTL() -> public_arpq;
 }
