@@ -42,11 +42,9 @@ public:
   }
 
   bool setVisitorRemainingLifetime(IPAddress homeAddress, IPAddress homeAgentAddress, unsigned int lifetime){
-    for(auto it = this->visitors.begin();it != this->visitors.end();){
+    for(auto it = this->visitors.begin();it != this->visitors.end();it++){
       if(it->MNhome == homeAddress and it->MNhomeAgent == homeAgentAddress){
         it->remainingLifetime = lifetime;
-      }else{
-        it++;
       }
     }
   }

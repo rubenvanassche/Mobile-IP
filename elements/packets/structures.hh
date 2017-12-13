@@ -68,4 +68,18 @@ struct registrationReply{
     uint32_t identification;
 };
 
+/*
+  Structures to keep information about the current connection of MN with FA
+ */
+
+struct agentConnection{
+    bool connected = false;
+    bool isHome = true;
+    IPAddress agentAddress;
+    IPAddress careOfAddress;
+
+    unsigned int lifetime = 0; // Lifetime orignally requested
+    unsigned int remainingLifetime = 0;
+};
+
 #endif

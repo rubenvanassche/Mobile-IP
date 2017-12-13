@@ -159,8 +159,10 @@ void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
 			return;
 		}
 
+
 		if(reply.code == 0 or reply.code == 1){
 				// Home agent accepted
+
 				if(reply.lifetime == 0){
 					// Remove the MN from the visitors list
 					this->visitors.remove(reply.home, reply.homeAgent);

@@ -42,13 +42,17 @@ void MobileIPNode::run_timer(Timer *timer) {
 		// TODO resend requests when no answer p50
 
 		// Decrease the lifetime of the current registration if there is one
-		if(this->registrationLifetime > 0){
-			this->registrationLifetime -= 1;
+		if(this->connection.remainingLifetime > 0){
+			this->connection.remainingLifetime -= 1;
 
-			if(this->registrationLifetime <= this->renewLifetime){
-				// TODO rergister with same FA address + lifetime
-				//this->reregister();
+			if(this->connection.remainingLifetime <= ((double)this->connection.lifetime/2.0)){
+				if(this->connection.isHome == false){
+					// TODO check if request was send so we don't send requests every second
+					this->registerFA(this->connection.agentAddress, this->connection.careOfAddress, this->connection.lifetime);
+				}
 			}
+		}else{
+			// TODO deconnect and try to reconenct
 		}
 
     requestsTimer.reschedule_after_sec(1);
@@ -72,13 +76,14 @@ Packet* MobileIPNode::simple_action(Packet *p) {
 
 void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 0 or reply.code == 1){
-		this->connected == true;
+		this->connection.connected == true;
+		this->connection.remainingLifetime = reply.lifetime;
 
 		if(reply.IP.source == this->homeAgentPrivateAddress){
-			this->isHome = true;
+			this->connection.isHome = true;
 			click_chatter("Connected to HA");
 		}else{
-			this->isHome = false;
+			this->connection.isHome = false;
 			click_chatter("Connected to FA");
 		}
 	}
@@ -96,7 +101,8 @@ void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 69){
 			click_chatter("Reply 69 : FA requested lifetime too long");
 			click_chatter("Retry request with lower lifetime");
-			this->registerFA(reply.IP.source, this->careOfAddress, reply.lifetime);
+			this->connection.lifetime = reply.lifetime;
+			this->registerFA(reply.IP.source, this->connection.careOfAddress, reply.lifetime);
 			return;
 	}
 
@@ -132,12 +138,18 @@ void MobileIPNode::processReply(registrationReply reply){
 
 	if(reply.code == 136){
 			click_chatter("Reply 136 : HA Unkown Home Agent Address");
+			// TODO: resend registration
 			return;
 	}
 }
 
 bool MobileIPNode::reregister(IPAddress address, IPAddress careOfAddress, unsigned int lifetime){
-	this->connected = false;
+	this->connection.connected = false;
+	this->connection.agentAddress = address;
+	this->connection.careOfAddress = careOfAddress;
+	this->connection.lifetime = lifetime;
+	this->connection.remainingLifetime = lifetime;
+
 
 	if(this->homeAgentPrivateAddress == address){
 		// TODO should delete registration with FA
@@ -157,7 +169,6 @@ void MobileIPNode::sendRequest(IPAddress destination, IPAddress careOfAddress, u
 	r.destination = destination;
 	r.careOfAddress = careOfAddress;
 	r.requestedLifetime = lifetime;
-	r.remainingLifetime = lifetime;
 	r.identification = identification;
 	this->requests.add(r);
 
@@ -165,7 +176,7 @@ void MobileIPNode::sendRequest(IPAddress destination, IPAddress careOfAddress, u
 }
 
 bool MobileIPNode::registerLL(){
-	this->sendRequest(IPAddress("224.0.0.11"), this->careOfAddress, 1800);
+	this->sendRequest(IPAddress("224.0.0.11"), this->connection.careOfAddress, 1800);
 }
 
 bool MobileIPNode::registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsigned int lifetime){
@@ -173,15 +184,15 @@ bool MobileIPNode::registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsi
 }
 
 bool MobileIPNode::registerHA(unsigned int lifetime){
-	this->sendRequest(this->homeAgentPrivateAddress, this->careOfAddress, lifetime, 16);
+	this->sendRequest(this->homeAgentPrivateAddress, this->connection.careOfAddress, lifetime, 16);
 }
 
 bool MobileIPNode::deregister(IPAddress FAAddress){
-	this->sendRequest(FAAddress, this->careOfAddress, 0);
+	this->sendRequest(FAAddress, this->connection.careOfAddress, 0);
 }
 
 bool MobileIPNode::deregister(IPAddress FAAddress, IPAddress address){
-	this->sendRequest(FAAddress, this->careOfAddress, 0);
+	this->sendRequest(FAAddress, this->connection.careOfAddress, 0);
 }
 
 CLICK_ENDDECLS

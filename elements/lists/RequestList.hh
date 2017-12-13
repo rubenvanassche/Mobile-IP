@@ -54,6 +54,8 @@ public:
         }else{
             it = this->requests.erase(it);
         }
+      }else{
+        it++;
       }
     }
   }

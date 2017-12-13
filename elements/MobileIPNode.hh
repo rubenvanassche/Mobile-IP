@@ -63,19 +63,13 @@ class MobileIPNode : public Element {
 		IPAddress homeAgentPublicAddress;
 		// The home agent adress of the MN on the link
 		IPAddress homeAgentPrivateAddress;
-		// The care of adress obtained by the MN
-		IPAddress careOfAddress;
 		// Port from where the registration request packets get send
 		unsigned int sourcePort = 5241;
 		// Time when to renew a registration
 		unsigned int renewLifetime = 10; // TODO set this to values specified by RFC
 
-		// connected to agent?
-		bool connected = false;
-		// registration lifetime
-		unsigned int registrationLifetime = 0;
-		// Is the node home
-		bool isHome = true;
+		// Connection with agent
+		agentConnection connection;
 
 		// Structure for keeping pending registrations
 		RequestList requests;

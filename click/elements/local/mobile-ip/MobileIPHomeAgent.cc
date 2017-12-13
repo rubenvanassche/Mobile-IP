@@ -154,7 +154,7 @@ bool MobileIPHomeAgent::checkRegistrationValidity(registrationRequest registrati
 
 		// check if reserved fields are 0
 		if(registration.r != false or registration.x != false){
-			this->sendReply(registration, 70, port);
+			this->sendReply(registration, 134, port);
 			return false;
 		}
 

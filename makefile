@@ -41,3 +41,6 @@ appFA:
 
 appTest:
 	cd click/apps/ClickController; java ClickController localhost 1981
+
+kill:
+	sudo killall -9 click
