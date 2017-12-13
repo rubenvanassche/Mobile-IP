@@ -145,13 +145,12 @@ TODO:
 - Wat als home agent ongekend
 - Eventueel in FA visitorlist en requestlist mergen(zie 3.7 en  3.6.1.1 en 3.6.2.3)
 - infinity lifetimes
+- Wanneer solicitation interval verhoogd wordt, worden er meer solicitations en dus advertismeents gestuurd. Maar dit heeft geen nut
+als de lifetime van de huidige connectie met een agent niet verlopen is. Enkel wanneer deze verloopt zal er met een andere agent
+geconnecteerd worden.
 - Adverisements worden nu automatisch naar 255.255.255.255 gestuurd en dus eth adress wordt ook FF:FF:FF:FF:FF:FF,
 momenteel wordt eth adress niet aangepast naar unicast adress indien een advertisement naar een bepaalde specieike node wordt gestuurd
 - Documentatie schrijven
 - Testen met scenario's(tevens deze opstellen)
 
-Vragen
-- Tunnelen van broadcasts vereist?
-- Moet de MN zichzelf registreren bij HA wanneer thuis?
-- Wat met replies 80,81,82, 88
-- IpinIP ICMP messages vereist? -> in RFC MobileIP niet
+
