@@ -73,6 +73,9 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	}
 
 	routerAdvertisement advertisement = processRouterAdvertisementMessage(p);
+	if(advertisement.homeAgent == true){
+		return NULL;
+	}
 
 	if(this->connected == false){
 		this->routerAddress = advertisement.IP.source;

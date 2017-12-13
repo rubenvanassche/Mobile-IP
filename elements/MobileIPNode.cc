@@ -39,7 +39,11 @@ void MobileIPNode::run_timer(Timer *timer) {
 		// Decrease the lifetime by one in the pending requests table
 		this->requests.decreaseLifetime();
 
-		// TODO resend requests when no answer p50
+		// resend requests when no answer p50
+		std::vector<RequestListItem> timedOutRequests = this->requests.removeTimedOutRequests(this->requestTimeout);
+		for(auto request : timedOutRequests){
+				this->sendRequest(request.destination, request.careOfAddress, request.requestedLifetime, request.ttl);
+		}
 
 		// Decrease the lifetime of the current registration if there is one
 		if(this->connection.remainingLifetime > 0){
@@ -58,26 +62,33 @@ void MobileIPNode::run_timer(Timer *timer) {
     requestsTimer.reschedule_after_sec(1);
 }
 
-Packet* MobileIPNode::simple_action(Packet *p) {
+void MobileIPNode::push(int port, Packet *p){
 	if(getPacketType(p) != REPLY){
-		return NULL;
+		return;
 	}
 
+	registrationReply reply;
 	try{
-		registrationReply r = processRegistrationReplyPacket(p);
-		this->processReply(r);
+		reply = processRegistrationReplyPacket(p);
 	}catch(InvalidChecksumException &e){
 		click_chatter("The registration reply contained an invalid checksum!");
-		return NULL;
+		return;
 	}
 
-	return NULL;
+	if(this->checkReplyValidity(reply) == true){
+		this->processReply(reply);
+	}
 }
 
 void MobileIPNode::processReply(registrationReply reply){
+	// Get the request for this REPLY
+	RequestListItem request = this->requests.remove(reply.identification);
+
 	if(reply.code == 0 or reply.code == 1){
+		unsigned int decreaseLifetime = abs(reply.lifetime - request.requestedLifetime);
+
 		this->connection.connected == true;
-		this->connection.remainingLifetime = reply.lifetime;
+		this->connection.remainingLifetime = request.requestedLifetime - decreaseLifetime; // Set the lifetime according to p49
 
 		if(reply.IP.source == this->homeAgentPrivateAddress){
 			this->connection.isHome = true;
@@ -101,8 +112,10 @@ void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 69){
 			click_chatter("Reply 69 : FA requested lifetime too long");
 			click_chatter("Retry request with lower lifetime");
+
+			// Reregister again
 			this->connection.lifetime = reply.lifetime;
-			this->registerFA(reply.IP.source, this->connection.careOfAddress, reply.lifetime);
+			this->registerFA(reply.IP.source, request.careOfAddress, reply.lifetime);
 			return;
 	}
 
@@ -139,8 +152,18 @@ void MobileIPNode::processReply(registrationReply reply){
 	if(reply.code == 136){
 			click_chatter("Reply 136 : HA Unkown Home Agent Address");
 			// TODO: resend registration
+			// TODO set home agent field to the correct one
 			return;
 	}
+}
+
+bool MobileIPNode::checkReplyValidity(registrationReply reply){
+	if(reply.identification != this->requests.getLastRequest().identification){
+		click_chatter("Reply's identification was not equal to last request send");
+		return false;
+	}
+
+	return true;
 }
 
 bool MobileIPNode::reregister(IPAddress address, IPAddress careOfAddress, unsigned int lifetime){
@@ -150,10 +173,8 @@ bool MobileIPNode::reregister(IPAddress address, IPAddress careOfAddress, unsign
 	this->connection.lifetime = lifetime;
 	this->connection.remainingLifetime = lifetime;
 
-
 	if(this->homeAgentPrivateAddress == address){
-		// TODO should delete registration with FA
-		//this->registerHA(lifetime);
+		this->deregister();
 	}else{
 		this->registerFA(address, careOfAddress, lifetime);
 	}
@@ -170,25 +191,26 @@ void MobileIPNode::sendRequest(IPAddress destination, IPAddress careOfAddress, u
 	r.careOfAddress = careOfAddress;
 	r.requestedLifetime = lifetime;
 	r.identification = identification;
+	r.ttl = ttl;
 	this->requests.add(r);
 
 	output(0).push(packet);
 }
 
 bool MobileIPNode::registerLL(){
-	this->sendRequest(IPAddress("224.0.0.11"), this->connection.careOfAddress, 1800);
+	this->sendRequest(IPAddress("255.255.255.255"), this->connection.careOfAddress, 1800);
 }
 
 bool MobileIPNode::registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsigned int lifetime){
 	this->sendRequest(FAAddress, careOfAddress, lifetime);
 }
 
-bool MobileIPNode::registerHA(unsigned int lifetime){
-	this->sendRequest(this->homeAgentPrivateAddress, this->connection.careOfAddress, lifetime, 16);
+bool MobileIPNode::deregister(){
+	this->sendRequest(this->homeAgentPrivateAddress, this->homeAgentPublicAddress, 0);
 }
 
 bool MobileIPNode::deregister(IPAddress FAAddress){
-	this->sendRequest(FAAddress, this->connection.careOfAddress, 0);
+	this->sendRequest(FAAddress, this->homeAgentPublicAddress, 0);
 }
 
 bool MobileIPNode::deregister(IPAddress FAAddress, IPAddress address){

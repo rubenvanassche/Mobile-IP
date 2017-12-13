@@ -21,6 +21,7 @@ class MobileIPNode : public Element {
 		~MobileIPNode();
 
 		int configure(Vector<String> &conf, ErrorHandler *errh);
+		void run_timer(Timer *timer);
 		int initialize(ErrorHandler *errh);
 		void add_handlers();
 
@@ -28,7 +29,7 @@ class MobileIPNode : public Element {
 		const char *port_count() const { return "1/1"; }
 		const char *processing() const { return PUSH; }
 
-		Packet *simple_action(Packet *p);
+		void push(int port, Packet *p);
 
 		// Process a Reply
 		void processReply(registrationReply reply);
@@ -47,13 +48,17 @@ class MobileIPNode : public Element {
 		// Register with the home Agent
 		bool registerHA(unsigned int lifetime);
 
-		// Deregister with home agent for all care-of-addresses
+		// Deregister with HA for all-care-of-addresses
+		bool deregister();
+
+		// Deregister with FA for all care-of-addresses
 		bool deregister(IPAddress FAAddress);
 
-		// Deregister with home agent for specified care of address
+		// Deregister with FA for specified care of address
 		bool deregister(IPAddress FAAddress, IPAddress address);
 
-		void run_timer(Timer *timer);
+		// Checks if the recieved reply is valid
+		bool checkReplyValidity(registrationReply reply);
 
 		// The home address of the MN
 		IPAddress homeAddress;
@@ -63,6 +68,8 @@ class MobileIPNode : public Element {
 		IPAddress homeAgentPrivateAddress;
 		// Port from where the registration request packets get send
 		unsigned int sourcePort = 5241;
+		// X seconds until an request is timed out and an new request is send
+		unsigned int requestTimeout = 10;
 
 		// Connection with agent
 		agentConnection connection;

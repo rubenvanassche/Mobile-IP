@@ -73,6 +73,10 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	}
 
 	routerAdvertisement advertisement = processRouterAdvertisementMessage(p);
+	if(advertisement.homeAgent == true){
+		// TODO this should probably be executed but then move dection doesn't work as it should
+		//return NULL;
+	}
 
 	if(this->connected == false){
 		this->routerAddress = advertisement.IP.source;

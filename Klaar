@@ -34,10 +34,10 @@
     3.5.2. Mobile-Home Authentication Extension ....................OK
     3.5.3. Mobile-Foreign Authentication Extension .................OK
     3.5.4. Foreign-Home Authentication Extension ...................OK
-  3.6. Mobile Node Considerations ..................................41
-    3.6.1. Sending Registration Requests ...........................43
-    3.6.2. Receiving Registration Replies ..........................47
-    3.6.3. Registration Retransmission .............................50
+  3.6. Mobile Node Considerations ..................................OK
+    3.6.1. Sending Registration Requests ...........................OK
+    3.6.2. Receiving Registration Replies ..........................OK
+    3.6.3. Registration Retransmission .............................OK
   3.7. Foreign Agent Considerations ................................OK
     3.7.1. Configuration and Registration Tables ...................OK
     3.7.2. Receiving Registration Requests .........................OK
@@ -95,4 +95,9 @@ TODO:
 - checken met reference !!!!!!!
 - terug naar HA
 - Wat als home agent ongekend
-- Eventueel in FA visitorlist en requestlist mergen(zie 3.7)
+- Eventueel in FA visitorlist en requestlist mergen(zie 3.7 en  3.6.1.1 en 3.6.2.3)
+- infinity lifetimes
+
+Vragen
+- Tunnelen van broadcasts vereist?
+- Moet de MN zichzelf registreren bij HA wanneer thuis?

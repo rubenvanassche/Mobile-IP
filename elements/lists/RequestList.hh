@@ -16,8 +16,12 @@ struct RequestListItem{
   IPAddress careOfAddress;
   unsigned int identification;
 
-  // Only for FA
+   // Only for FA
   registrationRequest rr;
+
+
+   // Only for HA
+  unsigned int ttl;
 
   unsigned int requestedLifetime;
   unsigned int remainingLifetime;
@@ -84,6 +88,10 @@ public:
 
   void add(RequestListItem item){
     this->requests.push_back(item);
+  }
+
+  RequestListItem getLastRequest(){
+    return this->requests.back();
   }
 
 private:

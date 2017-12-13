@@ -35,9 +35,9 @@ void MobileIPForeignAgent::run_timer(Timer *timer) {
 		this->requests.decreaseLifetime();
 
 		// Remove pending requests running longer then 7 seconds
-		this->sendRequestTimedOutReply(this->requests.removeTimedOutRequests(7));
+		this->sendRequestTimedOutReply(this->requests.removeTimedOutRequests(this->requestTimeout));
 
-		// remove visitors from visitorlist when remaaining lifetime is 0 and decrease the lifetime
+		// remove visitors from visitorlist when remaining lifetime is 0 and decrease the lifetime
 		this->visitors.decreaseLifetime();
 
     requestsTimer.reschedule_after_sec(1);
@@ -161,7 +161,6 @@ void MobileIPForeignAgent::relayReply(registrationReply reply){
 				}else{
 					// Add to visitor list
 					VisitorListItem visitor;
-					visitor.MNsource = request.rr.IP.source;
 					visitor.MNhome = reply.home;
 					visitor.MNhomeAgent = reply.homeAgent;
 					visitor.UDPSourcePort = request.rr.UDP.sourcePort;
