@@ -54,72 +54,40 @@ void MobileIPForeignAgent::add_handlers(){
 
 void MobileIPForeignAgent::push(int port, Packet *p) {
 	// Priavte network
-	if(port == 0){
-		if(getPacketType(p) == REGISTRATION){
-			registrationRequest registration;
-			try{
-				registration = processRegistrationRequestPacket(p);
-			}catch(ZeroChecksumException &e){
-				click_chatter("Request recieved at FA has an IP checksum 0");
-				return;
-			}catch(InvalidChecksumException &e){
-				click_chatter("Request recieved at FA has an invalid checksum");
-				return;
-			}
-
-			// Checks if the request recieved is valid
-			if(checkRegistrationValidity(registration) == false){
-				return;
-			}
-
-			// Create an new entry in the pending requests list
-			RequestListItem request;
-			request.destination = registration.IP.destination;
-			request.careOfAddress = this->careOfAddress;
-			request.requestedLifetime = registration.lifetime;
-			request.remainingLifetime = registration.lifetime;
-			request.identification = registration.identification;
-			request.rr = registration;
-
-			this->requests.add(request);
-
-			// Now send the request to the home agent
-			WritablePacket* packet = buildRegistrationRequestPacket(registration.lifetime, registration.home, registration.homeAgent, this->careOfAddress, registration.identification);
-			UDPIPfy(packet, this->careOfAddress, this->sourcePort, registration.homeAgent, 434, 16);
-			output(1).push(packet);
-
-
-			p->kill();
+	if(port == 0 and getPacketType(p) == REGISTRATION){
+		registrationRequest registration;
+		try{
+			registration = processRegistrationRequestPacket(p);
+		}catch(ZeroChecksumException &e){
+			click_chatter("Request recieved at FA has an IP checksum 0");
+			return;
+		}catch(InvalidChecksumException &e){
+			click_chatter("Request recieved at FA has an invalid checksum");
+			return;
 		}
 
-		return;
+		this->relayRequest(registration);
 	}
 
 	// Public network
-	if(port == 1){
-		if(getPacketType(p) == REPLY){
-			registrationReply reply;
-			try{
-				reply = processRegistrationReplyPacket(p);
-			}catch(ZeroChecksumException &e){
-				click_chatter("Reply from HA recieved at FA has an IP checksum 0");
-				return;
-			}catch(InvalidChecksumException &e){
-				click_chatter("Reply from HA recieved at FA has an invalid checksum");
-				return;
-			}
-
-			this->relayReply(reply);
-
-			// Kill the packet because we've dealt with it
-			p->kill();
-
+	if(port == 1 and getPacketType(p) == REPLY){
+		registrationReply reply;
+		try{
+			reply = processRegistrationReplyPacket(p);
+		}catch(ZeroChecksumException &e){
+			click_chatter("Reply from HA recieved at FA has an IP checksum 0");
+			return;
+		}catch(InvalidChecksumException &e){
+			click_chatter("Reply from HA recieved at FA has an invalid checksum");
+			return;
 		}
 
-		return;
+		this->relayReply(reply);
 	}
 
-};
+	// Kill the packet because we've dealt with it
+	p->kill();
+}
 
 void MobileIPForeignAgent::sendRequestTimedOutReply(std::vector<RequestListItem> requests){
 		for(auto request : requests){
@@ -132,12 +100,12 @@ void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned 
 }
 
 void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned int code, unsigned int lifetime){
-	IPAddress source = this->privateAddress;
+	IPAddress source = registration.IP.destination;
 	IPAddress destination = registration.IP.source;
 
 	// RFC p55
 	if(destination == IPAddress("255.255.255.255") ){
-		source = IPAddress("255.255.255.255");
+		source = this->privateAddress;
 	}
 
 	if(registration.home == IPAddress("0.0.0.0")){
@@ -155,7 +123,7 @@ void MobileIPForeignAgent::sendReply(registrationReply registration, IPAddress d
 
 	// RFC p55
 	if(destination == IPAddress("255.255.255.255") ){
-		source = IPAddress("255.255.255.255");
+		source =this->privateAddress;
 	}
 
 	if(registration.home == IPAddress("0.0.0.0")){
@@ -204,7 +172,7 @@ void MobileIPForeignAgent::relayReply(registrationReply reply){
 				}
 		}
 
-		this->sendReply(reply, request.rr.IP.source, request.rr.UDP.sourcePort);
+		this->sendReply(reply, reply.home, request.rr.UDP.sourcePort);
 
 		if(reply.lifetime != 0){
 			if(reply.code == 0 or reply.code == 1){
@@ -218,12 +186,41 @@ void MobileIPForeignAgent::relayReply(registrationReply reply){
 		}
 }
 
+void MobileIPForeignAgent::relayRequest(registrationRequest registration){
+			// Checks if the request recieved is valid
+			if(checkRegistrationValidity(registration) == false){
+				return;
+			}
+
+			// Create an new entry in the pending requests list
+			RequestListItem request;
+			request.destination = registration.IP.destination;
+			request.careOfAddress = this->careOfAddress;
+			request.requestedLifetime = registration.lifetime;
+			request.remainingLifetime = registration.lifetime;
+			request.identification = registration.identification;
+			request.rr = registration;
+
+			this->requests.add(request);
+
+			// Now send the request to the home agent
+			WritablePacket* packet = buildRegistrationRequestPacket(registration.lifetime, registration.home, registration.homeAgent, this->careOfAddress, registration.identification);
+			UDPIPfy(packet, this->careOfAddress, this->sourcePort, registration.homeAgent, 434, 16);
+			output(1).push(packet);
+}
+
 bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registration){
 		// TODO Check if there are other devices in the subnet that send this request
 
 		// check if reserved fields are 0
 		if(registration.r != false  or registration.x != false){
 			this->sendReply(registration, 70);
+			return false;
+		}
+
+		// Check if the right care-of-address was givven
+		if(registration.careOf != this->careOfAddress){
+			this->sendReply(registration, 77);
 			return false;
 		}
 

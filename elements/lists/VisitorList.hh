@@ -11,9 +11,7 @@
 #include <sstream>
 
 struct VisitorListItem{
-  IPAddress MNsource;
   IPAddress MNhome;
-  IPAddress MNdestination;
   unsigned int UDPSourcePort;
   IPAddress MNhomeAgent;
   unsigned int requestedLifetime;

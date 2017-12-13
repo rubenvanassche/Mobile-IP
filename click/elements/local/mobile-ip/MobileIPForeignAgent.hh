@@ -50,6 +50,9 @@ class MobileIPForeignAgent : public Element {
 		// Sends an reply recieved from the HA to the MN
 		void relayReply(registrationReply reply);
 
+		// Sends an request recieved from the MN to the HA
+		void relayRequest(registrationRequest registration);
+
 		// Checks wheter the registration request packet is valid
 		bool checkRegistrationValidity(registrationRequest registration);
 

@@ -155,7 +155,7 @@ bool MobileIPNode::reregister(IPAddress address, IPAddress careOfAddress, unsign
 		// TODO should delete registration with FA
 		//this->registerHA(lifetime);
 	}else{
-		this->registerFA(address, careOfAddress, lifetime);
+		this->registerFA(address, careOfAddress, lifetime + 1900);
 	}
 }
 

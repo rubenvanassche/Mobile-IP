@@ -50,6 +50,9 @@ class MobileIPForeignAgent : public Element {
 		// Sends an reply recieved from the HA to the MN
 		void relayReply(registrationReply reply);
 
+		// Sends an request recieved from the MN to the HA
+		void relayRequest(registrationRequest registration);
+
 		// Checks wheter the registration request packet is valid
 		bool checkRegistrationValidity(registrationRequest registration);
 
@@ -64,6 +67,7 @@ class MobileIPForeignAgent : public Element {
 		unsigned int maxPendingRegistrations = 5; // The maximal amount of registrations
 		unsigned int maxAcceptedLifetime = 1800; // The maximal lifetime this FA is accepting
 		unsigned int sourcePort = 3581;
+		unsigned int  = 7; // After x seconds with no response the request times out and sends an error reply
 
 		// The timer tracking the current requests
 		Timer requestsTimer;
