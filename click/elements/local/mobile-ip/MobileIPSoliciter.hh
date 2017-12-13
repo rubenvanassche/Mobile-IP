@@ -14,8 +14,6 @@ CLICK_DECLS
 // output 0 -> ICMP Router Solicitations
 // input 0 -> ICMP Router Advertisements
 class MobileIPSoliciter : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPSoliciter();
 		~MobileIPSoliciter();

@@ -16,8 +16,6 @@ CLICK_DECLS
  * output 0 -> Registration request
  */
 class MobileIPNode : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPNode();
 		~MobileIPNode();
@@ -65,8 +63,6 @@ class MobileIPNode : public Element {
 		IPAddress homeAgentPrivateAddress;
 		// Port from where the registration request packets get send
 		unsigned int sourcePort = 5241;
-		// Time when to renew a registration
-		unsigned int renewLifetime = 10; // TODO set this to values specified by RFC
 
 		// Connection with agent
 		agentConnection connection;

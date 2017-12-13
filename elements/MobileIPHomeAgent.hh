@@ -15,8 +15,6 @@ CLICK_DECLS
 // Output 0 -> private network
 // Output 1 -> public network
 class MobileIPHomeAgent : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPHomeAgent();
 		~MobileIPHomeAgent();

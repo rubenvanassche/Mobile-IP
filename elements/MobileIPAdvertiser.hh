@@ -15,8 +15,6 @@ CLICK_DECLS
  * output 1 -> sends Router Solicitations
  */
 class MobileIPAdvertiser : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPAdvertiser();
 		~MobileIPAdvertiser();

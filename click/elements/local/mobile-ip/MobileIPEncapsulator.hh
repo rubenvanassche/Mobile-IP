@@ -12,8 +12,6 @@ CLICK_DECLS
 // Output 0 -> all packages not tunneled
 // Output 1 -> packages tunneled, that should be send on the public network
 class MobileIPEncapsulator : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPEncapsulator();
 		~MobileIPEncapsulator();

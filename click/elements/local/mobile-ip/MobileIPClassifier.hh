@@ -17,8 +17,6 @@ CLICK_DECLS
  * Output 4 -> router solicitation
  */
 class MobileIPClassifier : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPClassifier();
 		~MobileIPClassifier();

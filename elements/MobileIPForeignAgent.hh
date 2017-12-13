@@ -17,8 +17,6 @@ CLICK_DECLS
 // Output 0 -> private network
 // Output 1 -> public network
 class MobileIPForeignAgent : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPForeignAgent();
 		~MobileIPForeignAgent();
@@ -46,8 +44,11 @@ class MobileIPForeignAgent : public Element {
 		// Sends an reply to the MN with specified lifetime
 		void sendReply(registrationRequest registration, unsigned int code, unsigned int lifetime);
 
+		// Sends an reply to the MN based upon an reply recieved from HA
+		void sendReply(registrationReply registration, IPAddress destination, unsigned int destinationPort);
+
 		// Sends an reply recieved from the HA to the MN
-		void sendReplyFromHA(registrationReply reply);
+		void relayReply(registrationReply reply);
 
 		// Checks wheter the registration request packet is valid
 		bool checkRegistrationValidity(registrationRequest registration);

@@ -109,7 +109,7 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 				return;
 			}
 
-			this->sendReplyFromHA(reply);
+			this->relayReply(reply);
 
 			// Kill the packet because we've dealt with it
 			p->kill();
@@ -150,47 +150,72 @@ void MobileIPForeignAgent::sendReply(registrationRequest registration, unsigned 
 	output(0).push(packet);
 }
 
-void MobileIPForeignAgent::sendReplyFromHA(registrationReply reply){
+void MobileIPForeignAgent::sendReply(registrationReply registration, IPAddress destination, unsigned int destinationPort){
+	IPAddress source = this->privateAddress;
+
+	// RFC p55
+	if(destination == IPAddress("255.255.255.255") ){
+		source = IPAddress("255.255.255.255");
+	}
+
+	if(registration.home == IPAddress("0.0.0.0")){
+		destination = IPAddress("255.255.255.255");
+	}
+
+	WritablePacket* packet = buildRegistrationReplyPacket(registration.lifetime, registration.code, registration.home, registration.homeAgent, registration.identification);
+	UDPIPfy(packet, source, 434, destination, destinationPort, 1);
+	output(0).push(packet);
+
+}
+
+void MobileIPForeignAgent::relayReply(registrationReply reply){
 		RequestListItem request;
 		try{
 			request = this->requests.remove(reply.identification);
 		}catch(RequestNotFoundException &e){
 			// Captured an reply to an request we haven't
+			click_chatter("Reply to unkwon request recieved");
 			return;
 		}
 
-
 		if(reply.code == 0 or reply.code == 1){
 				// Home agent accepted
+				unsigned int remainingLifetime = std::min(reply.lifetime, this->maxAcceptedLifetime);
 
-				if(reply.lifetime == 0){
-					// Remove the MN from the visitors list
-					this->visitors.remove(reply.home, reply.homeAgent);
-				}else{
-					// Add or update visitors list
-					unsigned int remainingLifetime = std::min(reply.lifetime, this->maxAcceptedLifetime);
-
-					if(this->visitors.has(reply.home, reply.homeAgent)){
-						this->visitors.setVisitorRemainingLifetime(reply.home, reply.homeAgent, remainingLifetime);
+				if(this->visitors.has(reply.home, reply.homeAgent)){
+					if(reply.lifetime == 0){
+						// Remove the MN from the visitors list
+						this->visitors.remove(reply.home, reply.homeAgent);
 					}else{
-						// Add a new visitor
-						VisitorListItem visitor;
-						visitor.MNsource = request.rr.IP.source;
-						visitor.MNhome = reply.home;
-						visitor.MNhomeAgent = reply.homeAgent;
-						visitor.UDPSourcePort = request.rr.UDP.sourcePort;
-						visitor.requestedLifetime = remainingLifetime;
-						visitor.remainingLifetime = remainingLifetime;
-
-						this->visitors.add(visitor);
+						// Update the visitors list
+						this->visitors.setVisitorRequestedLifetime(reply.home, reply.homeAgent, remainingLifetime);
 					}
+				}else{
+					// Add to visitor list
+					VisitorListItem visitor;
+					visitor.MNsource = request.rr.IP.source;
+					visitor.MNhome = reply.home;
+					visitor.MNhomeAgent = reply.homeAgent;
+					visitor.UDPSourcePort = request.rr.UDP.sourcePort;
+					visitor.requestedLifetime = remainingLifetime;
+					visitor.remainingLifetime = remainingLifetime;
+
+					this->visitors.add(visitor);
 				}
 		}
 
-		// TODO Relay the reply(checking the RFC is needed)
-		WritablePacket* packet = buildRegistrationReplyPacket(reply.lifetime, reply.code, reply.home, reply.homeAgent, reply.identification);
-		UDPIPfy(packet, this->privateAddress, 434, reply.home, request.rr.UDP.sourcePort, 1);
-		output(0).push(packet);
+		this->sendReply(reply, request.rr.IP.source, request.rr.UDP.sourcePort);
+
+		if(reply.lifetime != 0){
+			if(reply.code == 0 or reply.code == 1){
+				// Reset the lfietime in the visitor list
+				this->visitors.resetVisitorRemainingLifetime(reply.home, reply.homeAgent);
+			}else{
+				// Something went wrong in the HA so remove the visitor
+				// Remove the MN from the visitors list
+				this->visitors.remove(reply.home, reply.homeAgent);
+			}
+		}
 }
 
 bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registration){

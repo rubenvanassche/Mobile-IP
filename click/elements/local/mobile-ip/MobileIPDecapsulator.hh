@@ -12,8 +12,6 @@ CLICK_DECLS
 // Output 0 -> all packages not tunneled
 // Output 1 -> packages tunneled to this FA
 class MobileIPDecapsulator : public Element {
-	//TODO: Add private attributes
-
 	public:
 		MobileIPDecapsulator();
 		~MobileIPDecapsulator();

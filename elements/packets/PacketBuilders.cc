@@ -167,8 +167,8 @@ WritablePacket* buildRouterAdvertisementMessage(
       format->M = 0;
       format->F = (int) foreignAgent;
       format->H = (int) homeAgent;
-      format->B = 0; // TODO should be 1 if busy
-      format->R = 1; // TODO should be 1 if registration required
+      format->B = 0;
+      format->R = 1;
 
       format->careOfAddresses[0] = careOfAddress.in_addr();
 

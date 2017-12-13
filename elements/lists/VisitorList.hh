@@ -41,10 +41,20 @@ public:
     this->visitors.push_back(item);
   }
 
-  bool setVisitorRemainingLifetime(IPAddress homeAddress, IPAddress homeAgentAddress, unsigned int lifetime){
+  // Sets the lifetime that is counted down by the value in the visitor list
+  bool resetVisitorRemainingLifetime(IPAddress homeAddress, IPAddress homeAgentAddress){
     for(auto it = this->visitors.begin();it != this->visitors.end();it++){
       if(it->MNhome == homeAddress and it->MNhomeAgent == homeAgentAddress){
-        it->remainingLifetime = lifetime;
+        it->remainingLifetime = it->requestedLifetime;
+      }
+    }
+  }
+
+  // Sets the default requested lifetime for an visitor
+  bool setVisitorRequestedLifetime(IPAddress homeAddress, IPAddress homeAgentAddress, unsigned int lifetime){
+    for(auto it = this->visitors.begin();it != this->visitors.end();it++){
+      if(it->MNhome == homeAddress and it->MNhomeAgent == homeAgentAddress){
+        it->requestedLifetime = lifetime;
       }
     }
   }
