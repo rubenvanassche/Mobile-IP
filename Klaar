@@ -1,1 +1,92 @@
-3.7.3
+1. Introduction ....................................................5
+  1.1. Protocol Requirements .......................................5
+  1.2. Goals .......................................................6
+  1.3. Assumptions .................................................6
+  1.4. Applicability ...............................................6
+  1.5. New Architectural Entities ..................................7
+  1.6. Terminology .................................................7
+  1.7. Protocol Overview ...........................................11
+  1.8. Message Format and Protocol Extensibility ...................14
+  1.9. Type-Length-Value Extension Format for Mobile IP Extensions..16
+  1.10. Long Extension Format ......................................17
+  1.11. Short Extension Format .....................................18
+2. Agent Discovery .................................................18
+  2.1. Agent Advertisement .........................................19
+    2.1.1. Mobility Agent Advertisement Extension ..................21
+    2.1.2. Prefix-Lengths Extension ................................OK
+    2.1.3. One-Byte Padding Extension ..............................OK
+  2.2. Agent Solicitation ..........................................24
+  2.3. Foreign Agent and Home Agent Considerations .................24
+    2.3.1. Advertised Router Addresses .............................26
+    2.3.2. Sequence Numbers and Rollover Handling ..................26
+  2.4. Mobile Node Considerations ..................................26
+    2.4.1. Registration Required ...................................28
+    2.4.2. Move Detection ..........................................28
+    2.4.3. Returning Home ..........................................29
+    2.4.4. Sequence Numbers and Rollover Handling ..................29
+3. Registration ....................................................29
+  3.1. Registration Overview .......................................30
+  3.2. Authentication ..............................................OK
+  3.3. Registration Request ........................................32
+  3.4. Registration Reply ..........................................34
+  3.5. Registration Extensions .....................................OK
+    3.5.1. Computing Authentication Extension Values ...............OK
+    3.5.2. Mobile-Home Authentication Extension ....................OK
+    3.5.3. Mobile-Foreign Authentication Extension .................OK
+    3.5.4. Foreign-Home Authentication Extension ...................OK
+  3.6. Mobile Node Considerations ..................................41
+    3.6.1. Sending Registration Requests ...........................43
+    3.6.2. Receiving Registration Replies ..........................47
+    3.6.3. Registration Retransmission .............................50
+  3.7. Foreign Agent Considerations ................................50
+    3.7.1. Configuration and Registration Tables ...................51
+    3.7.2. Receiving Registration Requests .........................52
+    3.7.3. Receiving Registration Replies ..........................OK
+  3.8. Home Agent Considerations ...................................58
+    3.8.1. Configuration and Registration Tables ...................58
+    3.8.2. Receiving Registration Requests .........................59
+    3.8.3. Sending Registration Replies ............................64
+4. Routing Considerations ..........................................66
+  4.1. Encapsulation Types .........................................67
+  4.2. Unicast Datagram Routing ....................................67
+    4.2.1. Mobile Node Considerations ..............................67
+    4.2.2. Foreign Agent Considerations ............................68
+    4.2.3. Home Agent Considerations ...............................69
+  4.3. Broadcast Datagrams .........................................70
+  4.4. Multicast Datagram Routing ..................................71
+  4.5. Mobile Routers ..............................................72
+  4.6. ARP, Proxy ARP, and Gratuitous ARP ..........................OK
+5. Security Considerations .........................................OK
+  5.1. Message Authentication Codes ................................OK
+  5.2. Areas of Security Concern in This Protocol ..................OK
+  5.3. Key Management ..............................................OK
+  5.4. Picking Good Random Numbers .................................OK
+  5.5. Privacy .....................................................OK
+  5.6. Ingress Filtering ...........................................OK
+  5.7. Replay Protection for Registration Requests .................OK
+    5.7.1. Replay Protection Using Timestamps ......................OK
+    5.7.2. Replay Protection Using Nonces ..........................OK
+6. IANA Considerations .............................................OK
+  6.1. Mobile IP Message Types .....................................OK
+  6.2. Extensions to RFC 1256 Router Advertisement Messages ........OK
+  6.3. Extensions to Mobile IP Registration Messages ...............OK
+  6.4. Code Values for Mobile IP Registration Reply Messages .......OK
+7. Acknowledgments .................................................OK
+8. References ......................................................OK
+  8.1. Normative References ........................................OK
+  8.2. Informative References ......................................OK
+Appendix A. Link-Layer Considerations ..............................OK
+Appendix B. TCP Considerations .....................................OK
+  B.1. TCP Timers ..................................................OK
+  B.2. TCP Congestion Management ...................................OK
+Appendix C. Example Scenarios ......................................OK
+  C.1. Registering with a Foreign Agent Care-of Address ............OK
+  C.2. Registering with a Co-Located Care-of Address ...............OK
+  C.3. Deregistration ..............................................OK
+Appendix D. Applicability of Prefix-Lengths Extension ..............OK
+Appendix E. Interoperability Considerations ........................OK
+Appendix F. Changes since RFC 3344 .................................OK
+Appendix G. Example Messages .......................................OK
+  G.1. Example ICMP Agent Advertisement Message Format .............OK
+  G.2. Example Registration Request Message Format .................OK
+  G.3. Example Registration Reply Message Format ...................OK
