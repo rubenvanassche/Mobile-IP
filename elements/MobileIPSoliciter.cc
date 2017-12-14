@@ -87,16 +87,20 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	}
 
 	routerAdvertisement advertisement = processRouterAdvertisementMessage(p);
-	if(advertisement.homeAgent == true){
-		// TODO this should probably be executed but then move dection doesn't work as it should
-		//return NULL;
-	}
-
+	
 	if(this->connected == false){
 		// Not connected with agent so let's do that
 		this->connect(advertisement);
 
-	}else if(this->connected == true and this->routerAddress == advertisement.IP.source){
+	}else if(advertisement.homeAgent == true){
+		// When an Home Agent advertisement is recieved immediatly connect with it
+		// TODO check if statement above is following RFC
+		this->disconnect();
+
+		// Let's reconnect
+		this->connect(advertisement);
+
+	}else if(this->routerAddress == advertisement.IP.source){
 		// connected with agent in advertisement, so check if the agent resetted itself and raise lifetimes
 		if((advertisement.sequenceNumber - 1) != this->advertisementSequenceNumber and advertisement.sequenceNumber < 256){
 			// agent resetted itself
@@ -107,12 +111,15 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 			this->raiseLifetime(advertisement.lifetime);
 		}
 
-	}else if(this->connected == true and this->enableFastMoving == true){
+	}else if(this->enableFastMoving == true){
 		// advertisment from other agent, normally ignored. But fast moving is on so let's do that
 		this->disconnect();
 
 		// Let's reconnect
 		this->connect(advertisement);
+	}else{
+		// Sinkhole
+		// Is connected, is not an HA, is not current FA agent and should not fast move
 	}
 
 	return NULL;
