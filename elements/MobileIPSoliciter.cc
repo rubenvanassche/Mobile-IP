@@ -25,7 +25,7 @@ int MobileIPSoliciter::initialize(ErrorHandler *) {
 }
 void MobileIPSoliciter::run_timer(Timer *timer) {
 		if(timer == &lifetimeTimer){
-			this->move();
+			this->disconnect();
 			return;
 		}
 
@@ -39,6 +39,7 @@ void MobileIPSoliciter::run_timer(Timer *timer) {
 
 void MobileIPSoliciter::add_handlers(){
 		add_write_handler("set_solicitation_interval", &changeSolicitationIntervalHandler, (void *)0);
+		add_write_handler("enable_fast_moving", &changeSolicitationIntervalHandler, (void *)0);
 }
 
 
@@ -46,7 +47,7 @@ int MobileIPSoliciter::changeSolicitationIntervalHandler(const String &conf, Ele
 		MobileIPSoliciter* me = (MobileIPSoliciter*) e;
 
 		int seconds;
-		if(Args(errh).push_back_args(conf).read("SECONDS", seconds).complete() < 0){
+		if(Args(errh).push_back_args(conf).read_mp("SECONDS", seconds).complete() < 0){
 				return -1;
 		}
 
@@ -55,11 +56,24 @@ int MobileIPSoliciter::changeSolicitationIntervalHandler(const String &conf, Ele
 		return 0;
 }
 
+int enableFastMovingHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh){
+	MobileIPSoliciter* me = (MobileIPSoliciter*) e;
+
+	bool enabled;
+	if(Args(errh).push_back_args(conf).read_mp("VALUE", enabled).complete() < 0){
+			return -1;
+	}
+
+	me->enableFastMoving = enabled;
+
+	return 0;
+}
+
 void MobileIPSoliciter::raiseLifetime(int seconds){
 	this->lifetimeTimer.schedule_after_sec(seconds);
 }
 
-void MobileIPSoliciter::move(){
+void MobileIPSoliciter::disconnect(){
 	this->connected = false;
 	this->routerAddress = IPAddress();
 	this->advertisementSequenceNumber = 0;
@@ -79,17 +93,11 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	}
 
 	if(this->connected == false){
-		this->routerAddress = advertisement.IP.source;
-		this->connected = true;
-		this->raiseLifetime(advertisement.lifetime);
-		this->advertisementSequenceNumber = advertisement.sequenceNumber;
+		// Not connected with agent so let's do that
+		this->connect(advertisement);
 
-		this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
-
-		return NULL;
-	}
-
-	if(this->routerAddress == advertisement.IP.source){
+	}else if(this->connected == true and this->routerAddress == advertisement.IP.source){
+		// connected with agent in advertisement, so check if the agent resetted itself and raise lifetimes
 		if((advertisement.sequenceNumber - 1) != this->advertisementSequenceNumber and advertisement.sequenceNumber < 256){
 			// agent resetted itself
 			std::cout << "Agent resetted itself" << std::endl;
@@ -99,11 +107,25 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 			this->raiseLifetime(advertisement.lifetime);
 		}
 
-		return NULL;
+	}else if(this->connected == true and this->enableFastMoving == true){
+		// advertisment from other agent, normally ignored. But fast moving is on so let's do that
+		this->disconnect();
+
+		// Let's reconnect
+		this->connect(advertisement);
 	}
 
 	return NULL;
-};
+}
+
+void MobileIPSoliciter::connect(routerAdvertisement advertisement){
+	this->routerAddress = advertisement.IP.source;
+	this->connected = true;
+	this->raiseLifetime(advertisement.lifetime);
+	this->advertisementSequenceNumber = advertisement.sequenceNumber;
+
+	this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
+}
 
 void MobileIPSoliciter::changeSolicitationInterval(unsigned int seconds){
 	this->solicitationInterval = seconds;

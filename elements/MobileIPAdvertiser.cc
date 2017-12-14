@@ -103,6 +103,7 @@ bool MobileIPAdvertiser::sendAdvertisement(IPAddress destination){
 
 	// Raise the sequenceNumber
 	if(this->sequenceNumber == 65535){
+		// When sequence number is 0xffff -> return 256
 		this->sequenceNumber = 256;
 	}else{
 		this->sequenceNumber++;

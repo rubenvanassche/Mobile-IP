@@ -23,6 +23,8 @@ class MobileIPSoliciter : public Element {
 
 		// HANDLER for changing the solicitation interval
 		static int changeSolicitationIntervalHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
+		// HANDLER for enabeling the fast moving option
+		static int enableFastMovingHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh);
 		void add_handlers();
 
 		const char *class_name() const { return "MobileIPSoliciter"; }
@@ -42,11 +44,18 @@ class MobileIPSoliciter : public Element {
 		// Raise the lifetime remaining
 		void raiseLifetime(int seconds);
 
-		// The node is moved
-		void move();
+		// Disconnect from agent, happens when node was moved
+		void disconnect();
+
+		// Connect with agent, based upon advertisement
+		void connect(routerAdvertisement advertisement);
 
 		// Is the node connected to a router?
 		bool connected = false;
+
+		// when true, move detection will be enabled when an advertisment from another agent arrives
+		// This means that the soliciter won't wait until the lifetime of the current agent has passed
+		bool enableFastMoving = false;
 
 	private:
 		IPAddress linkAddress;
@@ -61,6 +70,7 @@ class MobileIPSoliciter : public Element {
 
 		// checks the advertisment sequence number for advertiser reset
 		unsigned int advertisementSequenceNumber = 0;
+
 
 		// Connection with the Mobile IP node
 		MobileIPNode* MN;
