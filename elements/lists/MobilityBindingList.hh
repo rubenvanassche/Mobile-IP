@@ -64,6 +64,11 @@ public:
 
   void decreaseLifetime(){
     for(auto it = this->mobilityBindings.begin();it != this->mobilityBindings.end();){
+      if(it->remainingLifetime == 65535){
+        // Infinity lifetime, so do not decrease
+        continue;
+      }
+
       // Do not remove requests with zero lifetime because they are deregisters
       it->remainingLifetime -= 1;
 

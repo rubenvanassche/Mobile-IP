@@ -152,5 +152,4 @@ geconnecteerd worden.
 momenteel wordt eth adress niet aangepast naar unicast adress indien een advertisement naar een bepaalde specieike node wordt gestuurd
 - Documentatie schrijven
 - Testen met scenario's(tevens deze opstellen)
-
-
+-Wanneer een reset van een agent waarbij de node geregistreerd is, wordt gedetecteerd adhv sequence numbers, wordt opnieuw geregistreerd.

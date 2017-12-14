@@ -50,10 +50,15 @@ public:
 
   void decreaseLifetime(){
     for(auto it = this->requests.begin();it != this->requests.end();){
+      if(this->requestedLifetime == 65535){
+        // Infinity lifetime so do not decrease
+        continue;
+      }
+
       // Do not remove requests with zero lifetime because they are deregisters
-      if((*it).requestedLifetime != 0){
-        if((*it).remainingLifetime != 0){
-          (*it).remainingLifetime -= 1;
+      if(it->requestedLifetime != 0){
+        if(it->remainingLifetime != 0){
+          it->remainingLifetime -= 1;
 
           ++it;
         }else{

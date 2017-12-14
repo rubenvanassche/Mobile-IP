@@ -47,17 +47,20 @@ void MobileIPNode::run_timer(Timer *timer) {
 
 		// Decrease the lifetime of the current registration if there is one
 		// TODO: this is stilll quite a mess, should be cleaned up
-		if(this->connection.remainingLifetime > 0){
-			this->connection.remainingLifetime -= 1;
+		if(this->connction.lifetime != 65535){
+			// ^- check if lifetime is infinity
+			if(this->connection.remainingLifetime > 0){
+				this->connection.remainingLifetime -= 1;
 
-			if(this->connection.remainingLifetime <= ((double)this->connection.lifetime/2.0)){
-				if(this->connection.isHome == false){
-					// TODO check if request was send so we don't send requests every second
-					this->registerFA(this->connection.agentAddress, this->connection.careOfAddress, this->connection.lifetime);
+				if(this->connection.remainingLifetime <= ((double)this->connection.lifetime/2.0)){
+					if(this->connection.isHome == false){
+						// TODO check if request was send so we don't send requests every second
+						this->registerFA(this->connection.agentAddress, this->connection.careOfAddress, this->connection.lifetime);
+					}
 				}
+			}else{
+				// TODO deconnect and try to reconenct
 			}
-		}else{
-			// TODO deconnect and try to reconenct
 		}
 
     requestsTimer.reschedule_after_sec(1);
