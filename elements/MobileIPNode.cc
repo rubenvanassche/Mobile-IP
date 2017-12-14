@@ -47,7 +47,7 @@ void MobileIPNode::run_timer(Timer *timer) {
 
 		// Decrease the lifetime of the current registration if there is one
 		// TODO: this is stilll quite a mess, should be cleaned up
-		if(this->connction.lifetime != 65535){
+		if(this->connection.lifetime != 65535){
 			// ^- check if lifetime is infinity
 			if(this->connection.remainingLifetime > 0){
 				this->connection.remainingLifetime -= 1;

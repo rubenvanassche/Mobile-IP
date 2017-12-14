@@ -39,7 +39,7 @@ void MobileIPSoliciter::run_timer(Timer *timer) {
 
 void MobileIPSoliciter::add_handlers(){
 		add_write_handler("set_solicitation_interval", &changeSolicitationIntervalHandler, (void *)0);
-		add_write_handler("enable_fast_moving", &changeSolicitationIntervalHandler, (void *)0);
+		add_write_handler("enable_fast_moving", &enableFastMovingHandler, (void *)0);
 }
 
 
@@ -56,7 +56,7 @@ int MobileIPSoliciter::changeSolicitationIntervalHandler(const String &conf, Ele
 		return 0;
 }
 
-int enableFastMovingHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh){
+int MobileIPSoliciter::enableFastMovingHandler(const String &conf, Element *e, void * thunk, ErrorHandler * errh){
 	MobileIPSoliciter* me = (MobileIPSoliciter*) e;
 
 	bool enabled;

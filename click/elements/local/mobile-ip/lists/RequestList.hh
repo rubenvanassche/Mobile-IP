@@ -50,7 +50,7 @@ public:
 
   void decreaseLifetime(){
     for(auto it = this->requests.begin();it != this->requests.end();){
-      if(this->requestedLifetime == 65535){
+      if(it->requestedLifetime == 65535){
         // Infinity lifetime so do not decrease
         continue;
       }
