@@ -25,6 +25,7 @@ int MobileIPSoliciter::initialize(ErrorHandler *) {
 }
 void MobileIPSoliciter::run_timer(Timer *timer) {
 		if(timer == &lifetimeTimer){
+			click_chatter("Node was moved");
 			this->disconnect();
 			return;
 		}
@@ -75,10 +76,9 @@ void MobileIPSoliciter::raiseLifetime(int seconds){
 
 void MobileIPSoliciter::disconnect(){
 	this->connected = false;
-	this->routerAddress = IPAddress();
+	this->agentAddress = IPAddress();
 	this->advertisementSequenceNumber = 0;
 
-	click_chatter("Node was moved");
 }
 
 Packet *MobileIPSoliciter::simple_action(Packet *p) {
@@ -86,29 +86,44 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		return NULL;
 	}
 
-	routerAdvertisement advertisement = processRouterAdvertisementMessage(p);
-	
-	if(this->connected == false){
-		// Not connected with agent so let's do that
-		this->connect(advertisement);
+	routerAdvertisement adv = processRouterAdvertisementMessage(p);
 
-	}else if(advertisement.homeAgent == true){
+
+	if(adv.homeAgent == true){
+		if(this->connected == true and this->agentAddress ==  adv.IP.source){
+			// Already connected with HA, we don't care about sequence numbers because
+			// the reset of HA is not important
+			this->advertisementSequenceNumber++;
+			this->raiseLifetime(adv.lifetime);
+			return NULL;
+		}
+
 		// When an Home Agent advertisement is recieved immediatly connect with it
-		// TODO check if statement above is following RFC
-		this->disconnect();
+		if(this->firstConnection == true){
+			// This is the first connection, with an HA this means we do not register
+			this->firstConnection = false;
 
-		// Let's reconnect
-		this->connect(advertisement);
+			this->disconnect();
+			this->connect(adv, false);
+		}else{
+			click_chatter("Node was moved");
+			this->disconnect();
+			this->connect(adv);
+		}
 
-	}else if(this->routerAddress == advertisement.IP.source){
-		// connected with agent in advertisement, so check if the agent resetted itself and raise lifetimes
-		if((advertisement.sequenceNumber - 1) != this->advertisementSequenceNumber and advertisement.sequenceNumber < 256){
+	}else if(this->connected == false){
+			// Not connected with FA so let's do that
+			this->connect(adv);
+	}else if(this->agentAddress == adv.IP.source){
+		// connected with FA in advertisement, so check if the agent resetted itself and raise lifetimes
+		if((adv.sequenceNumber - 1) != this->advertisementSequenceNumber and adv.sequenceNumber < 256){
 			// agent resetted itself
 			std::cout << "Agent resetted itself" << std::endl;
-			this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
+			this->MN->reregister(adv.IP.source, adv.careOfAddress, adv.lifetime);
+			this->advertisementSequenceNumber = adv.sequenceNumber;
 		}else{
 			this->advertisementSequenceNumber++;
-			this->raiseLifetime(advertisement.lifetime);
+			this->raiseLifetime(adv.lifetime);
 		}
 
 	}else if(this->enableFastMoving == true){
@@ -116,7 +131,9 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		this->disconnect();
 
 		// Let's reconnect
-		this->connect(advertisement);
+		this->connect(adv);
+
+		click_chatter("Node was moved");
 	}else{
 		// Sinkhole
 		// Is connected, is not an HA, is not current FA agent and should not fast move
@@ -125,13 +142,15 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	return NULL;
 }
 
-void MobileIPSoliciter::connect(routerAdvertisement advertisement){
-	this->routerAddress = advertisement.IP.source;
+void MobileIPSoliciter::connect(routerAdvertisement advertisement, bool requestRegistration){
+	this->agentAddress = advertisement.IP.source;
 	this->connected = true;
 	this->raiseLifetime(advertisement.lifetime);
 	this->advertisementSequenceNumber = advertisement.sequenceNumber;
 
-	this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
+	if(requestRegistration == true){
+		this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
+	}
 }
 
 void MobileIPSoliciter::changeSolicitationInterval(unsigned int seconds){

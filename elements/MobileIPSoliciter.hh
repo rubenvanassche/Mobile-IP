@@ -48,7 +48,7 @@ class MobileIPSoliciter : public Element {
 		void disconnect();
 
 		// Connect with agent, based upon advertisement
-		void connect(routerAdvertisement advertisement);
+		void connect(routerAdvertisement advertisement, bool requestRegistration = true);
 
 		// Is the node connected to a router?
 		bool connected = false;
@@ -58,8 +58,14 @@ class MobileIPSoliciter : public Element {
 		bool enableFastMoving = false;
 
 	private:
+		// Address of this node
 		IPAddress linkAddress;
-		IPAddress routerAddress;
+
+		// Adress of agent connected with
+		IPAddress agentAddress;
+
+		// Checks if this is the first time connecting, if so do not register with HA
+		bool firstConnection = true;
 
 		// tracks how many seconds remain before the lifetime from the latest router advertisement ends
 		Timer lifetimeTimer;
