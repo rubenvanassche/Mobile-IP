@@ -86,7 +86,15 @@ void MobileIPNode::push(int port, Packet *p){
 
 void MobileIPNode::processReply(registrationReply reply){
 	// Get the request for this REPLY
-	RequestListItem request = this->requests.remove(reply.identification);
+	RequestListItem request;
+	try{
+		request = this->requests.remove(reply.identification);
+	}catch(RequestNotFoundException &e){
+		// Captured an reply to an request we haven't
+		click_chatter("Reply to unkwon request recieved");
+		return;
+	}
+
 
 	if(reply.code == 0 or reply.code == 1){
 		unsigned int decreaseLifetime = abs(reply.lifetime - request.requestedLifetime);
@@ -210,7 +218,7 @@ bool MobileIPNode::registerFA(IPAddress FAAddress, IPAddress careOfAddress, unsi
 }
 
 bool MobileIPNode::deregister(){
-	this->sendRequest(this->homeAgentPrivateAddress, this->homeAgentPublicAddress, 0);
+	this->sendRequest(this->homeAgentPrivateAddress, this->homeAddress, 0);
 }
 
 bool MobileIPNode::deregister(IPAddress FAAddress){

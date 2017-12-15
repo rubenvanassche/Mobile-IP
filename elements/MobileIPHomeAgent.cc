@@ -31,8 +31,6 @@ void MobileIPHomeAgent::run_timer(Timer *timer) {
 
 		// Decrease the lifetime by one in the pending requests table
 		this->mobilityBindings.decreaseLifetime();
-		//std::cout << this->mobilityBindings.print() << std::endl;
-
 
     mobilityBindingListTimer.reschedule_after_sec(1);
 }
@@ -159,8 +157,7 @@ bool MobileIPHomeAgent::checkRegistrationValidity(registrationRequest registrati
 		}
 
 		// Check if options in the registration are set that aren't supported
-		if(registration.B == true or
-				registration.D == true or
+		if(registration.D == true or
 				registration.M == true or
 				registration.G == true or
 				registration.T == true){
