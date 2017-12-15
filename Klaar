@@ -46,10 +46,10 @@
     3.7.1. Configuration and Registration Tables ...................OK
     3.7.2. Receiving Registration Requests .........................OK
     3.7.3. Receiving Registration Replies ..........................OK
-  3.8. Home Agent Considerations ...................................58
-    3.8.1. Configuration and Registration Tables ...................58
-    3.8.2. Receiving Registration Requests .........................59
-    3.8.3. Sending Registration Replies ............................64
+  3.8. Home Agent Considerations ...................................OK
+    3.8.1. Configuration and Registration Tables ...................OK
+    3.8.2. Receiving Registration Requests .........................OK
+    3.8.3. Sending Registration Replies ............................OK
 4. Routing Considerations ..........................................OK
   4.1. Encapsulation Types .........................................OK
   4.2. Unicast Datagram Routing ....................................OK
@@ -141,17 +141,13 @@ Author’s Address ...................................................
 
 TODO:
 - checken met reference !!!!!!!
-- terug naar HA
 - Wat als home agent ongekend
 - Eventueel in FA visitorlist en requestlist mergen(zie 3.7 en  3.6.1.1 en 3.6.2.3)
 - infinity lifetimes
-- Wanneer solicitation interval verhoogd wordt, worden er meer solicitations en dus advertismeents gestuurd. Maar dit heeft geen nut
-als de lifetime van de huidige connectie met een agent niet verlopen is. Enkel wanneer deze verloopt zal er met een andere agent
-geconnecteerd worden.
 - Adverisements worden nu automatisch naar 255.255.255.255 gestuurd en dus eth adress wordt ook FF:FF:FF:FF:FF:FF,
 momenteel wordt eth adress niet aangepast naar unicast adress indien een advertisement naar een bepaalde specieike node wordt gestuurd
 - Documentatie schrijven
 - Testen met scenario's(tevens deze opstellen)
 -Wanneer een reset van een agent waarbij de node geregistreerd is, wordt gedetecteerd adhv sequence numbers, wordt opnieuw geregistreerd.
-- Van FA naar HA met lfietime op 1800 werkt momenteel niet, fast moving on
 - Checken van checksum exception catching bij alle processing van packets
+- Deregister is momenteel enkel all adresses, beter één unicast

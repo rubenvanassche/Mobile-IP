@@ -102,12 +102,17 @@ void MobileIPHomeAgent::sendReply(registrationRequest registration, unsigned int
 	IPAddress destination = registration.IP.source;
 
 	// RFC p64
-	if(destination == IPAddress("255.255.255.255") ){
+	if(source == IPAddress("255.255.255.255") ){
 		if(port == 0){
 			source = this->privateAddress;
 		}else if(port == 1){
 			source == this->publicAddress;
 		}
+	}
+
+	// If lifetime is 0 -> send directly to private network because MN is over there
+	if(lifetime == 0){
+		port = 0;
 	}
 
 	WritablePacket* packet = buildRegistrationReplyPacket(lifetime, code, registration.home, registration.homeAgent, registration.identification);
