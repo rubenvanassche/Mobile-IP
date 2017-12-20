@@ -24,6 +24,9 @@ setup:
 run:
 	cd click/scripts; sudo ./start_click.sh
 
+reference: build
+	cd click-reference/solution; sudo ./start_click.sh
+
 th:
 	cd click/scripts; ./to_home.sh
 

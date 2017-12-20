@@ -35,10 +35,11 @@ struct routerAdvertisementMessage{
   uint8_t type; // should be 9
   uint8_t code; // should be 0
   uint16_t checksum;
-  uint8_t numAddrs; // should be 0
+  uint8_t numAddrs; // should be 1
   uint8_t addrEntrySize; // should be 2
   uint16_t lifetime;
-  // uint_32 addresses[]
+  in_addr addresses[1];
+  uint32_t preferenceLevels[1];
   // Mobile IP Stuff
   uint8_t type2; // should be 16
   uint8_t length; // 6 + 4*N with N = number of care-of addresses

@@ -17,7 +17,7 @@ PacketType getPacketType(Packet* packet){
       unsigned int offset = sizeof(click_ip);
       routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset);
 
-      if(format->type == 9 and (format->type2 == 16 or format->type2 == 0)){
+      if(format->type == 9 and (format->code == 16 or format->code == 0)){
         return ADVERTISEMENT;
       }else if(format->type == 10){
         return SOLICITATION;

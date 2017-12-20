@@ -147,9 +147,11 @@ WritablePacket* buildRouterAdvertisementMessage(
 
       format->type = 9;
       format->code = 0;
-      format->numAddrs = 0;
+      format->numAddrs = 1;
       format->addrEntrySize = 2;
       format->lifetime = htons(lifetime);
+      format->addresses[0] = careOfAddress.in_addr();
+      format->preferenceLevels[0] = htonl(1);
 
       // Mobile IP
       format->type2 = 16;
