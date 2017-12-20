@@ -28,7 +28,7 @@ class MobileIPSoliciter : public Element {
 		void add_handlers();
 
 		const char *class_name() const { return "MobileIPSoliciter"; }
-		const char *port_count() const { return "1/1"; }
+		const char *port_count() const { return "2/1"; }
 		const char *processing() const { return AGNOSTIC; }
 
 		Packet *simple_action(Packet *p);

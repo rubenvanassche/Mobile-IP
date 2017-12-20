@@ -1,14 +1,19 @@
-mn :: MobileIPNode(HOME_ADDRESS 1.2.3.4, HA_PRIVATE_ADDRESS 1.2.3.4, HA_PUBLIC_ADDRESS 1.2.3.4);
-Idle -> mn;
+mn :: MobileIPNode(HOME_ADDRESS 192.168.1.1, HA_PRIVATE_ADDRESS 192.1.1.1, HA_PUBLIC_ADDRESS 192.168.1.1)
+sol :: MobileIPSoliciter(LINK_ADDRESS 192.168.1.1,MN mn);
+adv :: MobileIPAdvertiser(LINK_ADDRESS 192.168.1.1, CAREOF_ADDRESS 192.168.1.1, HA true);
+cl :: MobileIPClassifier(ADVERTISEMENT 0, SOLICITATION 1);
+
 mn -> Discard;
-adv :: MobileIPSoliciter(LINK_ADDRESS 192.168.1.1,MN mn);
-//adv :: MobileIPAdvertiser(LINK_ADDRESS 192.168.1.1, CAREOF_ADDRESS 192.168.1.1, HA true);
-cl :: MobileIPClassifier();
-Idle -> adv;
-//adv ->   EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test.pcap") -> Strip(14)-> cl;
-adv -> ToDump("test.pcap") -> cl;
-cl -> Discard;
-cl[1] -> Discard;
-cl[2] -> Discard;
-cl[3] -> Discard;
-cl[4] -> Discard;
+Idle -> mn;
+
+sol -> cl;
+adv -> cl;
+
+cl[0]  -> sol;
+cl[1] -> EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test.pcap") -> Strip(14) -> adv;
+
+
+
+
+
+//adv ->   cl;

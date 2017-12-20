@@ -48,7 +48,7 @@ elementclass Agent {
 		-> Paint(1)
 		-> Strip(14)
 		-> CheckIPHeader
-		-> private_mipclass :: MobileIPClassifier
+		-> private_mipclass :: MobileIPClassifier(REGISTRATION 1, REPLY 2, IPINIP 3, SOLICITATION 4)
 		-> rt;
 
 	// Input and output paths for interface 1
@@ -69,7 +69,7 @@ elementclass Agent {
 		-> Paint(2)
 		-> Strip(14)
 		-> CheckIPHeader
-		-> public_mipclass :: MobileIPClassifier
+		-> public_mipclass :: MobileIPClassifier(REGISTRATION 1, REPLY 2, IPINIP 3, SOLICITATION 4)
 		-> rt;
 
 
@@ -130,7 +130,7 @@ elementclass Agent {
 		-> rt;
 
 		// Advertise Mobile IP to clients on private network
-		mipadvertiser -> EtherEncap(0x0800, $private_address:eth, FF:FF:FF:FF:FF:FF)  -> output;
+		mipadvertiser -> private_arpq;
 		public_mipclass[4] -> mipadvertiser;
 		private_mipclass[4] -> mipadvertiser;
 

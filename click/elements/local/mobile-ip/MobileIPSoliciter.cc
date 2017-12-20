@@ -88,6 +88,8 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 
 	routerAdvertisement adv = processRouterAdvertisementMessage(p);
 
+	std::cout << adv.IP.destination.s().c_str() << std::endl;
+
 
 	if(adv.homeAgent == true){
 		if(this->connected == true and this->agentAddress ==  adv.IP.source){

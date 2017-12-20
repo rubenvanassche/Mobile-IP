@@ -18,7 +18,8 @@ elementclass MobileNode {
 	// Shared IP input path
 	ip :: Strip(14)
 		-> CheckIPHeader
-		-> mipclass :: MobileIPClassifier
+		-> mipclass :: MobileIPClassifier(REPLY 1, ADVERTISEMENT 2)
+		-> EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test.pcap") -> Strip(14)
 		-> rt :: LinearIPLookup(
 			$address:ip/32 0,
 			$address:ipnet 1,
@@ -58,21 +59,15 @@ elementclass MobileNode {
 
 	// Mobile IP functionality
 	mipnode :: MobileIPNode(HOME_ADDRESS $address:ip, HA_PRIVATE_ADDRESS $gateway:ip, HA_PUBLIC_ADDRESS $home_agent:ip);
-	mipclass[2] -> mipnode;
+	mipclass[1] -> mipnode;
 	mipnode -> arpq; // send registration requests out
 
 	// Get solicitations
 	mipsoliciter :: MobileIPSoliciter(LINK_ADDRESS $address:ip, MN mipnode);
 	mipsoliciter -> arpq; // ignore solicitations at this time
+
 	rt[2] -> mipsoliciter; // addresses on 255.255.255.255
+	mipclass[2] -> [1]mipsoliciter; // adv with other ip's
 
-	// We don't expect resgistrations requests
-	mipclass[1] -> Discard;
-
-	// Decapsulate IPinIP
-	mipclass[3] -> Discard;
-
-	// We don't expect solicitations
-	mipclass[4] -> Discard;
 
 }
