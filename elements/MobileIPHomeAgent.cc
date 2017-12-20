@@ -73,6 +73,7 @@ void MobileIPHomeAgent::push(int port, Packet *p) {
 				// Remove all bindings
 				this->mobilityBindings.remove(registration.home);
 			}else{
+				std::cout << "removed" << registration.careOf.s().c_str() << std::endl;
 				// Remove binding for this careOf address
 				this->mobilityBindings.remove(registration.home, registration.careOf);
 			}

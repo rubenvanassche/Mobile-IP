@@ -49,7 +49,7 @@ class MobileIPHomeAgent : public Element {
 		IPAddress privateAddress; // The private network address
 		IPAddress FAAddress; // The address of the FA
 
-		unsigned int maxAcceptedLifetime = 65535; // The maximal lifetime this HA is accepting
+		unsigned int maxAcceptedLifetime = 1800; // The maximal lifetime this HA is accepting
 		unsigned int sourcePort = 5241;
 
 		// Timer that decreases the lifetime i the mobility list

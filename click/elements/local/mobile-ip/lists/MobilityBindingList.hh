@@ -89,6 +89,8 @@ public:
       out << it->homeAddress.s().c_str();
       out <<  "   ";
       out <<  it->remainingLifetime;
+      out << "    CA: ";
+      out << it->careOfAddress.s().c_str();
       out << "\n";
     }
     out << "------------------------------------\n";

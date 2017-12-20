@@ -179,17 +179,17 @@ bool MobileIPNode::checkReplyValidity(registrationReply reply){
 }
 
 bool MobileIPNode::reregister(IPAddress address, IPAddress careOfAddress, unsigned int lifetime){
+	if(this->homeAgentPrivateAddress == address){
+		this->deregister(this->connection.careOfAddress);
+	}else{
+		this->registerFA(address, careOfAddress, lifetime);
+	}
+
 	this->connection.connected = false;
 	this->connection.agentAddress = address;
 	this->connection.careOfAddress = careOfAddress;
 	this->connection.lifetime = lifetime;
 	this->connection.remainingLifetime = lifetime;
-
-	if(this->homeAgentPrivateAddress == address){
-		this->deregister();
-	}else{
-		this->registerFA(address, careOfAddress, lifetime);
-	}
 }
 
 void MobileIPNode::sendRequest(IPAddress destination, IPAddress careOfAddress, unsigned int lifetime, unsigned int ttl){
@@ -221,13 +221,10 @@ bool MobileIPNode::deregister(){
 	this->sendRequest(this->homeAgentPrivateAddress, this->homeAddress, 0);
 }
 
-bool MobileIPNode::deregister(IPAddress FAAddress){
-	this->sendRequest(FAAddress, this->homeAgentPublicAddress, 0);
+bool MobileIPNode::deregister(IPAddress address){
+	this->sendRequest(this->homeAgentPrivateAddress, address, 0);
 }
 
-bool MobileIPNode::deregister(IPAddress FAAddress, IPAddress address){
-	this->sendRequest(FAAddress, this->connection.careOfAddress, 0);
-}
 
 CLICK_ENDDECLS
 EXPORT_ELEMENT(MobileIPNode)

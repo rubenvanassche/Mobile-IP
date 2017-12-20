@@ -51,11 +51,8 @@ class MobileIPNode : public Element {
 		// Deregister with HA for all-care-of-addresses
 		bool deregister();
 
-		// Deregister with FA for all care-of-addresses
-		bool deregister(IPAddress FAAddress);
-
-		// Deregister with FA for specified care of address
-		bool deregister(IPAddress FAAddress, IPAddress address);
+		// Deregister with HA for specified adress
+		bool deregister(IPAddress address);
 
 		// Checks if the recieved reply is valid
 		bool checkReplyValidity(registrationReply reply);
