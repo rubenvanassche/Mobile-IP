@@ -86,7 +86,15 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		return NULL;
 	}
 
-	routerAdvertisement adv = processRouterAdvertisementMessage(p);
+	routerAdvertisement adv;
+
+	try{
+		adv = processRouterAdvertisementMessage(p);
+	}catch(ZeroChecksumException &e){
+		click_chatter("Zero Checksum in Router Advertisement");
+	}catch(InvalidChecksumException &e){
+		click_chatter("Invalid Checksum in Router Advertisement");
+	}
 
 
 	if(adv.homeAgent == true){

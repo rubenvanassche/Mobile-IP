@@ -145,5 +145,3 @@ TODO:
 - Eventueel in FA visitorlist en requestlist mergen(zie 3.7 en  3.6.1.1 en 3.6.2.3)
 - Documentatie schrijven
 - Testen met scenario's(tevens deze opstellen)
-- Checken van checksum exception catching bij alle processing van packets
-- Deregister is momenteel enkel all adresses, beter één unicast
