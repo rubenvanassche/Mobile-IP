@@ -52,6 +52,7 @@ public:
     for(auto it = this->requests.begin();it != this->requests.end();){
       if(it->requestedLifetime == 65535){
         // Infinity lifetime so do not decrease
+        it++;
         continue;
       }
 

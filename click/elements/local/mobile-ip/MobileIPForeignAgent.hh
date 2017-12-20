@@ -65,7 +65,7 @@ class MobileIPForeignAgent : public Element {
 		IPAddress HAAddress; // The address of the HA
 
 		unsigned int maxPendingRegistrations = 5; // The maximal amount of registrations
-		unsigned int maxAcceptedLifetime = 1800; // The maximal lifetime this FA is accepting
+		unsigned int maxAcceptedLifetime = 65535; // The maximal lifetime this FA is accepting
 		unsigned int sourcePort = 3581;
 		unsigned int requestTimeout = 7; // After x seconds with no response the request times out and sends an error reply
 

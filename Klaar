@@ -144,8 +144,6 @@ TODO:
 - Wat als home agent ongekend
 - Eventueel in FA visitorlist en requestlist mergen(zie 3.7 en  3.6.1.1 en 3.6.2.3)
 - infinity lifetimes
-- Adverisements worden nu automatisch naar 255.255.255.255 gestuurd en dus eth adress wordt ook FF:FF:FF:FF:FF:FF,
-momenteel wordt eth adress niet aangepast naar unicast adress indien een advertisement naar een bepaalde specieike node wordt gestuurd
 - Documentatie schrijven
 - Testen met scenario's(tevens deze opstellen)
 -Wanneer een reset van een agent waarbij de node geregistreerd is, wordt gedetecteerd adhv sequence numbers, wordt opnieuw geregistreerd.

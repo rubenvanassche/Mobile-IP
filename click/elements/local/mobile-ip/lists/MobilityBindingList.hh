@@ -66,6 +66,7 @@ public:
     for(auto it = this->mobilityBindings.begin();it != this->mobilityBindings.end();){
       if(it->remainingLifetime == 65535){
         // Infinity lifetime, so do not decrease
+        it++;
         continue;
       }
 
