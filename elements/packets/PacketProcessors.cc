@@ -9,8 +9,8 @@ CLICK_DECLS
 PacketType getPacketType(Packet* packet){
     int etherOffset = 0; // Will be set to size of ethernet header when there is one
     if(packet->has_mac_header()){
+      std::cout << "JOP" << std::endl;
       etherOffset = sizeof(click_ether);
-      std::cout << "JUP" << std::endl;
     }
 
     if(packet->has_network_header() == false){

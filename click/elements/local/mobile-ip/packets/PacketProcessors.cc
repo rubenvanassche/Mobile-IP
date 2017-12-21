@@ -7,6 +7,12 @@
 CLICK_DECLS
 
 PacketType getPacketType(Packet* packet){
+    int etherOffset = 0; // Will be set to size of ethernet header when there is one
+    if(packet->has_mac_header()){
+      std::cout << "JOP" << std::endl;
+      etherOffset = sizeof(click_ether);
+    }
+
     if(packet->has_network_header() == false){
       return UNKOWN;
     }
@@ -15,7 +21,7 @@ PacketType getPacketType(Packet* packet){
 
     if(ipType->ip_p == IP_PROTO_ICMP){
       unsigned int offset = sizeof(click_ip);
-      routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset);
+      routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset + etherOffset);
 
       if(format->type == 9 and (format->code == 16 or format->code == 0)){
         return ADVERTISEMENT;
@@ -28,7 +34,7 @@ PacketType getPacketType(Packet* packet){
       return IPINIP;
     }else if(ipType->ip_p == IP_PROTO_UDP){
       unsigned int offset = sizeof(click_ip) + sizeof(click_udp);
-      registrationReplyPacket* format = (registrationReplyPacket*)(packet->data() + offset);
+      registrationReplyPacket* format = (registrationReplyPacket*)(packet->data() + offset + etherOffset);
 
       if(format->type == 1){
         return REGISTRATION;
