@@ -2,6 +2,7 @@
 #define CLICK_PACKETS_STRUCTURES_HH
 
 #include <click/ipaddress.hh>
+#include <click/etheraddress.hh>
 
 /*
   Structures for easy using of data in packets
@@ -15,6 +16,11 @@ struct UDPHeader{
 struct IPHeader{
   IPAddress source;
   IPAddress destination;
+};
+
+struct EtherHeader{
+  EtherAddress source;
+  EtherAddress destination;
 };
 
 struct tunnelIP{

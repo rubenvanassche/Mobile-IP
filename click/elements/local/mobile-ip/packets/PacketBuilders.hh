@@ -8,12 +8,22 @@
 #include "packets.hh"
 #include <click/packet.hh>
 #include <click/timestamp.hh>
+#include <click/etheraddress.hh>
 #include <sys/time.h>
 #include <clicknet/udp.h>
 #include <clicknet/ether.h>
 #include <iostream>
 
 CLICK_DECLS
+
+/**
+ * Adds an ethernet Header to the packet
+ */
+WritablePacket* Etherfy(
+  WritablePacket* packet,
+  EtherAddress source,
+  EtherAddress destination
+);
 
 /**
  * Adds an ip hrader to the packet

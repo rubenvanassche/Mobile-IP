@@ -15,4 +15,3 @@ mobile_node[1]
 	-> ICMPPingResponder
 	-> EtherEncap(0x0800, mobile_node_address:eth, mobile_node_address:eth)
 	-> mobile_node
-

@@ -96,8 +96,6 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		click_chatter("Invalid Checksum in Router Advertisement");
 	}
 
-	std::cout << (int)adv.sequenceNumber << std::endl;
-
 	if(adv.IP.source == this->MN->homeAgentPrivateAddress){
 		if(this->connected == true and this->agentAddress ==  adv.IP.source){
 			// Already connected with HA, we don't care about sequence numbers because

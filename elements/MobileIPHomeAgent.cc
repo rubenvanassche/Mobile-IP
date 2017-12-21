@@ -79,7 +79,7 @@ void MobileIPHomeAgent::push(int port, Packet *p) {
 			}
 
 			// Send a reply to indicate that the request was accpeted to delete
-			this->sendReply(registration, 1, port, 0);
+			this->sendReply(registration, 0, port, 0);
 		}else{
 			// Now let's check the lifetime
 			unsigned int lifetime = registration.lifetime;
@@ -89,7 +89,7 @@ void MobileIPHomeAgent::push(int port, Packet *p) {
 
 			// Add and send reply
 			this->mobilityBindings.add(registration.home, registration.careOf, lifetime);
-			this->sendReply(registration, 1, port, lifetime);
+			this->sendReply(registration, 0, port, lifetime);
 		}
 	}
 };

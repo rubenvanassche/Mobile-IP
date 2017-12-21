@@ -24,6 +24,11 @@ enum PacketType {IPINIP, ADVERTISEMENT, SOLICITATION, REGISTRATION, REPLY, UNKOW
 PacketType getPacketType(Packet* packet);
 
 /**
+ * Get information from the Ethernet Header
+ */
+EtherHeader processEtherHeader(Packet* packet);
+
+/**
  * Get information from the UDP Header
  */
 UDPHeader processUDPHeader(Packet* packet);

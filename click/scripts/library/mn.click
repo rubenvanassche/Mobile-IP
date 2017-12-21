@@ -19,7 +19,6 @@ elementclass MobileNode {
 	ip :: Strip(14)
 		-> CheckIPHeader
 		-> mipclass :: MobileIPClassifier(REPLY 1, ADVERTISEMENT 2)
-		-> EtherEncap(0x0800, 1:1:1:1:1:1, 2:2:2:2:2:2) -> ToDump("test.pcap") -> Strip(14)
 		-> rt :: LinearIPLookup(
 			$address:ip/32 0,
 			$address:ipnet 1,

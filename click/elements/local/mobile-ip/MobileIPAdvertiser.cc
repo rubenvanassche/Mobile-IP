@@ -100,6 +100,7 @@ bool MobileIPAdvertiser::sendAdvertisement(IPAddress destination){
 	);
 
 	ICMPIPfy(packet, this->linkAddress, destination, 1);
+	Etherfy(packet, EtherAddress(), EtherAddress().make_broadcast());
 
 	// Raise the sequenceNumber
 	if(this->sequenceNumber == 65535){

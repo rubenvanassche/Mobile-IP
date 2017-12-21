@@ -6,6 +6,25 @@
 
 CLICK_DECLS
 
+WritablePacket* Etherfy(
+  WritablePacket* packet,
+  EtherAddress source,
+  EtherAddress destination
+){
+  packet->push(sizeof(click_ether));
+  click_ether *ether = reinterpret_cast<click_ether *>(packet->data());
+
+  // set up Ethernet header
+  ether->ether_type = htons(ETHERTYPE_IP);
+
+  memcpy(ether, destination.data(), 6);
+  memcpy(ether + 6, source.data(), 6);
+
+  packet->set_ether_header(ether);
+
+  return packet;
+}
+
 WritablePacket* ICMPIPfy(
   WritablePacket* packet,
   IPAddress source,

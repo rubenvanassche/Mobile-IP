@@ -43,6 +43,16 @@ PacketType getPacketType(Packet* packet){
 
 }
 
+EtherHeader processEtherHeader(Packet* packet){
+    EtherHeader structure;
+    click_ether* format = (click_ether*)(packet);
+
+    structure.source = EtherAddress(format->ether_shost);
+    structure.destination = EtherAddress(format->ether_dhost);
+
+    return structure;
+}
+
 UDPHeader processUDPHeader(Packet* packet){
     UDPHeader structure;
     click_udp* format = (click_udp*)(packet->network_header() + sizeof(click_ip));
