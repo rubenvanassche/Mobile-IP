@@ -26,7 +26,7 @@ PacketType getPacketType(Packet* packet);
 /**
  * Get information from the Ethernet Header
  */
-EtherHeader processEtherHeader(Packet* packet);
+EtherHeader processEtherHeader(Packet* packet, bool stripHeader = false);
 
 /**
  * Get information from the UDP Header

@@ -86,6 +86,8 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		return NULL;
 	}
 
+	//EtherHeader ether = processEtherHeader(p);
+
 	routerAdvertisement adv;
 
 	try{
@@ -95,6 +97,7 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	}catch(InvalidChecksumException &e){
 		click_chatter("Invalid Checksum in Router Advertisement");
 	}
+
 
 	if(adv.IP.source == this->MN->homeAgentPrivateAddress){
 		if(this->connected == true and this->agentAddress ==  adv.IP.source){

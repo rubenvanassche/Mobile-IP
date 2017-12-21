@@ -8,12 +8,15 @@ CLICK_DECLS
 
 PacketType getPacketType(Packet* packet){
     int etherOffset = 0; // Will be set to size of ethernet header when there is one
-    if(packet->has_mac_header()){
-      std::cout << "JOP" << std::endl;
+
+    click_ether* ether = (click_ether*)(packet->data());
+    if(ether->ether_type == htons(ETHERTYPE_IP)){
+      //std::cout << "ETH";
       etherOffset = sizeof(click_ether);
     }
 
     if(packet->has_network_header() == false){
+      //std::cout << " - NO NETWORK HEADER" << std::endl;
       return UNKOWN;
     }
 
@@ -24,37 +27,50 @@ PacketType getPacketType(Packet* packet){
       routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset + etherOffset);
 
       if(format->type == 9 and (format->code == 16 or format->code == 0)){
+        //std::cout << " - ADV" << std::endl;
         return ADVERTISEMENT;
       }else if(format->type == 10){
+        //std::cout << " - SOL" << std::endl;
         return SOLICITATION;
       }else{
+        //std::cout << " - ICMP" << std::endl;
         return UNKOWN;
       }
     }else if(ipType->ip_p == IP_PROTO_IPIP){
+      //std::cout << " - IPINIP" << std::endl;
       return IPINIP;
     }else if(ipType->ip_p == IP_PROTO_UDP){
       unsigned int offset = sizeof(click_ip) + sizeof(click_udp);
       registrationReplyPacket* format = (registrationReplyPacket*)(packet->data() + offset + etherOffset);
 
       if(format->type == 1){
+        //std::cout << " - REG" << std::endl;
         return REGISTRATION;
       }else if(format->type == 3){
+        //std::cout << " - REPLY" << std::endl;
         return REPLY;
       }else{
+        //std::cout << " - IP" << std::endl;
         return UNKOWN;
       }
     }else{
+      //std::cout << " - UNKW" << std::endl;
       return UNKOWN;
     }
 
 }
 
-EtherHeader processEtherHeader(Packet* packet){
+EtherHeader processEtherHeader(Packet* packet, bool stripHeader){
     EtherHeader structure;
     click_ether* format = (click_ether*)(packet);
 
     structure.source = EtherAddress(format->ether_shost);
     structure.destination = EtherAddress(format->ether_dhost);
+
+    if(stripHeader == true){
+      packet->pull(sizeof(click_ether));
+      packet->set_ether_header(NULL);
+    }
 
     return structure;
 }
