@@ -64,12 +64,11 @@ EtherHeader processEtherHeader(Packet* packet, bool stripHeader){
     EtherHeader structure;
     click_ether* format = (click_ether*)(packet);
 
-    structure.source = EtherAddress(format->ether_shost);
-    structure.destination = EtherAddress(format->ether_dhost);
+    structure.source = EthernetAddress(format->ether_shost);
+    structure.destination = EthernetAddress(format->ether_dhost);
 
     if(stripHeader == true){
       packet->pull(sizeof(click_ether));
-      packet->set_ether_header(NULL);
     }
 
     return structure;

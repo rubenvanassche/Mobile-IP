@@ -8,7 +8,7 @@
 #include "packets.hh"
 #include <click/packet.hh>
 #include <click/timestamp.hh>
-#include <click/etheraddress.hh>
+#include "../structures/EthernetAddress.hh"
 #include <sys/time.h>
 #include <clicknet/udp.h>
 #include <clicknet/ether.h>
@@ -21,8 +21,8 @@ CLICK_DECLS
  */
 WritablePacket* Etherfy(
   WritablePacket* packet,
-  EtherAddress source,
-  EtherAddress destination
+  EthernetAddress source,
+  EthernetAddress destination
 );
 
 /**

@@ -78,15 +78,26 @@ void MobileIPSoliciter::disconnect(){
 	this->connected = false;
 	this->agentAddress = IPAddress();
 	this->advertisementSequenceNumber = 0;
-
 }
+
+bool MobileIPSoliciter::isHome(){
+	if(this->connected == false){
+		return true;
+	}else if(this->connected == true and this->agentAddress == this->MN->homeAgentPrivateAddress){
+		return true;
+	}else{
+		return false;
+	}
+}
+
 
 Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	if(getPacketType(p) != ADVERTISEMENT){
 		return NULL;
 	}
 
-	//EtherHeader ether = processEtherHeader(p);
+	EtherHeader ether = processEtherHeader(p, true);
+		std::cout << ether.destination.s() << std::endl;
 
 	routerAdvertisement adv;
 
@@ -114,16 +125,16 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 			this->firstConnection = false;
 
 			this->disconnect();
-			this->connect(adv, false);
+			this->connect(adv, ether, false);
 		}else{
 			click_chatter("Node was moved");
 			this->disconnect();
-			this->connect(adv);
+			this->connect(adv, ether);
 		}
 
 	}else if(this->connected == false){
 			// Not connected with FA so let's do that
-			this->connect(adv);
+			this->connect(adv, ether);
 	}else if(this->agentAddress == adv.IP.source){
 		// connected with FA in advertisement, so check if the agent resetted itself and raise lifetimes
 		if((adv.sequenceNumber - 1) != this->advertisementSequenceNumber and adv.sequenceNumber < 256){
@@ -141,7 +152,7 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		this->disconnect();
 
 		// Let's reconnect
-		this->connect(adv);
+		this->connect(adv, ether);
 
 		click_chatter("Node was moved");
 	}else{
@@ -152,11 +163,12 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	return NULL;
 }
 
-void MobileIPSoliciter::connect(routerAdvertisement advertisement, bool requestRegistration){
+void MobileIPSoliciter::connect(routerAdvertisement advertisement, EtherHeader ether, bool requestRegistration){
 	this->agentAddress = advertisement.IP.source;
 	this->connected = true;
 	this->raiseLifetime(advertisement.lifetime);
 	this->advertisementSequenceNumber = advertisement.sequenceNumber;
+	this->agentMAC = ether.source;
 
 	if(requestRegistration == true){
 		this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);

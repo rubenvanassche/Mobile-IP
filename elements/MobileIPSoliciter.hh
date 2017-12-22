@@ -28,7 +28,7 @@ class MobileIPSoliciter : public Element {
 		void add_handlers();
 
 		const char *class_name() const { return "MobileIPSoliciter"; }
-		const char *port_count() const { return "2/1"; }
+		const char *port_count() const { return "1/1"; }
 		const char *processing() const { return AGNOSTIC; }
 
 		Packet *simple_action(Packet *p);
@@ -41,6 +41,9 @@ class MobileIPSoliciter : public Element {
 		bool sendSolicitation();
 		bool sendSolicitation(IPAddress destination);
 
+		// Checks if soliciter is home
+		bool isHome();
+
 		// Raise the lifetime remaining
 		void raiseLifetime(int seconds);
 
@@ -48,7 +51,7 @@ class MobileIPSoliciter : public Element {
 		void disconnect();
 
 		// Connect with agent, based upon advertisement
-		void connect(routerAdvertisement advertisement, bool requestRegistration = true);
+		void connect(routerAdvertisement advertisement, EtherHeader ether, bool requestRegistration = true);
 
 		// Is the node connected to a router?
 		bool connected = false;
@@ -57,12 +60,16 @@ class MobileIPSoliciter : public Element {
 		// This means that the soliciter won't wait until the lifetime of the current agent has passed
 		bool enableFastMoving = false;
 
+		// Mac adress of the agent
+		EthernetAddress agentMAC;
+
 	private:
 		// Address of this node
 		IPAddress linkAddress;
 
 		// Adress of agent connected with
 		IPAddress agentAddress;
+
 
 		// Checks if this is the first time connecting, if so do not register with HA
 		bool firstConnection = true;
