@@ -162,6 +162,7 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	return NULL;
 }
 
+
 void MobileIPSoliciter::connect(routerAdvertisement advertisement, EtherHeader ether, bool requestRegistration){
 	this->agentAddress = advertisement.IP.source;
 	this->connected = true;

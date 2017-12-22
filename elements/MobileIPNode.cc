@@ -175,6 +175,11 @@ bool MobileIPNode::checkReplyValidity(registrationReply reply){
 		return false;
 	}
 
+	if(reply.UDP.destinationPort != this->sourcePort){
+		click_chatter("Reply send to wrong port!");
+		return false;
+	}
+
 	return true;
 }
 

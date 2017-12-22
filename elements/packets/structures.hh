@@ -32,6 +32,7 @@ struct tunnelIP{
 
 struct routerAdvertisement{
     unsigned int lifetime;
+    unsigned int code;
     unsigned int sequenceNumber;
     unsigned int registrationLifetime;
     bool homeAgent;

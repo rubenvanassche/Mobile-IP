@@ -90,6 +90,7 @@ bool MobileIPAdvertiser::sendAdvertisement(){
 }
 
 bool MobileIPAdvertiser::sendAdvertisement(IPAddress destination){
+
 	WritablePacket* packet = buildRouterAdvertisementMessage(
 		this->lifetime,
 		this->registrationLifetime,

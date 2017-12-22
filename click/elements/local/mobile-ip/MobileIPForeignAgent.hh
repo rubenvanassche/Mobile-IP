@@ -57,7 +57,7 @@ class MobileIPForeignAgent : public Element {
 		bool checkRegistrationValidity(registrationRequest registration);
 
 		// Checks wheter the registration reply packet is valid
-		bool checkRegistrationValidity(registrationReply registration);
+		bool checkRegistrationValidity(registrationReply registration, RequestListItem request);
 
 		IPAddress publicAddress; // The public network address
 		IPAddress privateAddress; // The private network address

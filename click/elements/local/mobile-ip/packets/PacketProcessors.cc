@@ -163,11 +163,21 @@ routerAdvertisement processRouterAdvertisementMessage(Packet* packet){
   routerAdvertisementMessage* format = (routerAdvertisementMessage*)(packet->data() + offset);
 
   structure.lifetime = ntohs(format->lifetime);
+  structure.code = format->code;
   structure.sequenceNumber = ntohs(format->sequenceNumber);
   structure.registrationLifetime = ntohs(format->registrationLifetime);
   structure.homeAgent = (bool) format->H;
   structure.foreignAgent = (bool) format->H;
   structure.careOfAddress = IPAddress(format->careOfAddresses[0]);
+
+  // Checksum
+  unsigned int checksum = format->checksum;
+  format->checksum = 0;
+  unsigned int verifiedChecksum = click_in_cksum((unsigned char *)format, sizeof(routerAdvertisementMessage));
+  if(verifiedChecksum != checksum){
+    throw InvalidChecksumException("Advertisement");
+  }
+  format->checksum = checksum;
 
   structure.IP = processIPHeader(packet);
 
@@ -179,6 +189,15 @@ routerSolicitation processRouterSolicitationMessage(Packet* packet){
 
   unsigned int offset = sizeof(click_ip);
   routerSolicitationMessage* format = (routerSolicitationMessage*)(packet->data() + offset);
+
+  // Checksum
+  unsigned int checksum = format->checksum;
+  format->checksum = 0;
+  unsigned int verifiedChecksum = click_in_cksum((unsigned char *)format, sizeof(routerSolicitationMessage));
+  if(verifiedChecksum != checksum){
+    throw InvalidChecksumException("Advertisement");
+  }
+  format->checksum = checksum;
 
   structure.IP = processIPHeader(packet);
 

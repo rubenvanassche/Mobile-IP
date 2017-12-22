@@ -138,11 +138,16 @@ void MobileIPForeignAgent::sendReply(registrationReply registration, IPAddress d
 
 void MobileIPForeignAgent::relayReply(registrationReply reply){
 		RequestListItem request;
+
 		try{
 			request = this->requests.remove(reply.identification);
 		}catch(RequestNotFoundException &e){
 			// Captured an reply to an request we haven't
 			click_chatter("Reply to unkwon request recieved");
+			return;
+		}
+
+		if(this->checkRegistrationValidity(reply, request) == false){
 			return;
 		}
 
@@ -209,7 +214,11 @@ void MobileIPForeignAgent::relayRequest(registrationRequest registration){
 }
 
 bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registration){
-		// TODO Check if there are other devices in the subnet that send this request
+		// Check if resuest was recieved on correct port
+		if(registration.UDP.destinationPort != 434){
+			click_chatter("Reply send to wrong port!");
+			return false;
+		}
 
 		// check if reserved fields are 0
 		if(registration.r != false  or registration.x != false){
@@ -250,7 +259,7 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationRequest registr
 		return true;
 }
 
-bool MobileIPForeignAgent::checkRegistrationValidity(registrationReply registration){
+bool MobileIPForeignAgent::checkRegistrationValidity(registrationReply registration, RequestListItem request){
 		// check if reserved fields are 0
 		/*
 		if(registration.r != false  or registration.x != false){
@@ -258,6 +267,17 @@ bool MobileIPForeignAgent::checkRegistrationValidity(registrationReply registrat
 			return false;
 		}
 		*/
+
+		if(registration.home != request.rr.home){
+			click_chatter("Home adress in reply was not the same as in request!");
+			return false;
+		}
+
+		// Check if reply was recieved on correct port
+		if(registration.UDP.destinationPort != this->sourcePort){
+			click_chatter("Reply send to wrong port!");
+			return false;
+		}
 
 		return true;
 }

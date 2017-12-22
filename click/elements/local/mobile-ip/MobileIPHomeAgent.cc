@@ -156,6 +156,12 @@ bool MobileIPHomeAgent::checkForUnkwownHomeAgent(registrationRequest registratio
 bool MobileIPHomeAgent::checkRegistrationValidity(registrationRequest registration, unsigned int port){
 		// TODO check if send subnet-directed broadcast address and reply p61
 
+		// Check if resuest was recieved on correct port
+		if(registration.UDP.destinationPort != 434){
+			click_chatter("Reply send to wrong port!");
+			return false;
+		}
+
 		// check if reserved fields are 0
 		if(registration.r != false or registration.x != false){
 			this->sendReply(registration, 134, port);
@@ -170,8 +176,6 @@ bool MobileIPHomeAgent::checkRegistrationValidity(registrationRequest registrati
 					this->sendReply(registration, 128, port);
 					return false;
 				}
-
-		// TODO? When home address is zero return 129 -> p65
 
 		return true;
 }
