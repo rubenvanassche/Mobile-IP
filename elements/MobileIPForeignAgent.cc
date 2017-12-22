@@ -50,6 +50,9 @@ String MobileIPForeignAgent::getVisitorsHandler(Element *e, void * thunk){
 
 void MobileIPForeignAgent::add_handlers(){
 		add_read_handler("visitors", &getVisitorsHandler, (void *)0);
+		add_data_handlers("max_lifetime", Handler::OP_READ | Handler::OP_WRITE, &maxAcceptedLifetime);
+		add_data_handlers("request_timeout", Handler::OP_READ | Handler::OP_WRITE, &requestTimeout);
+		add_data_handlers("max_pending_registrations", Handler::OP_READ | Handler::OP_WRITE, &maxPendingRegistrations);
 }
 
 void MobileIPForeignAgent::push(int port, Packet *p) {

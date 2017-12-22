@@ -42,6 +42,7 @@ String MobileIPHomeAgent::getMobilityBindingsHandler(Element *e, void * thunk){
 
 void MobileIPHomeAgent::add_handlers(){
 		add_read_handler("mobility_bindings", &getMobilityBindingsHandler, (void *)0);
+		add_data_handlers("max_lifetime", Handler::OP_READ | Handler::OP_WRITE, &maxAcceptedLifetime);
 }
 
 void MobileIPHomeAgent::push(int port, Packet *p) {

@@ -29,7 +29,7 @@ int MobileIPNode::initialize(ErrorHandler *) {
 
 
 void MobileIPNode::add_handlers(){
-
+		add_data_handlers("request_timeout", Handler::OP_READ | Handler::OP_WRITE, &requestTimeout);
 }
 
 void MobileIPNode::run_timer(Timer *timer) {

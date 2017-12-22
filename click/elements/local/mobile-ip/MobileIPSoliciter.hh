@@ -84,7 +84,6 @@ class MobileIPSoliciter : public Element {
 		// checks the advertisment sequence number for advertiser reset
 		unsigned int advertisementSequenceNumber = 0;
 
-
 		// Connection with the Mobile IP node
 		MobileIPNode* MN;
 };
