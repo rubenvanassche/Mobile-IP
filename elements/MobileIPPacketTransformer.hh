@@ -14,10 +14,10 @@ class MobileIPPacketTransformer : public Element {
 		~MobileIPPacketTransformer();
 
 		const char *class_name() const { return "MobileIPPacketTransformer"; }
-		const char *port_count() const { return "1/1"; }
-		const char *processing() const { return AGNOSTIC; }
+		const char *port_count() const { return "1/2"; }
+		const char *processing() const { return PUSH; }
 
-		Packet *simple_action(Packet *p);
+		void push(int port, Packet *p);
 
 		MobileIPSoliciter* soliciter;
 };

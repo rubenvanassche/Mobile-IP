@@ -62,7 +62,7 @@ PacketType getPacketType(Packet* packet){
 
 EtherHeader processEtherHeader(Packet* packet, bool stripHeader){
     EtherHeader structure;
-    click_ether* format = (click_ether*)(packet);
+    click_ether* format = (click_ether*)(packet->data());
 
     structure.source = EthernetAddress(format->ether_shost);
     structure.destination = EthernetAddress(format->ether_dhost);

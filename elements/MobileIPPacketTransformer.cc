@@ -16,22 +16,23 @@ int MobileIPPacketTransformer::configure(Vector<String> &conf, ErrorHandler *err
 		return 0;
 }
 
-Packet* MobileIPPacketTransformer::simple_action(Packet *p) {
+void MobileIPPacketTransformer::push(int port, Packet *p) {
 	if(this->soliciter->isHome() == false and this->soliciter->agentMAC.isZero() == false){
-
 		WritablePacket* q = p->uniqueify();
 
-		EtherHeader ether = processEtherHeader(q, true);
+
+		EtherHeader ether = processEtherHeader(q, false);
 		Etherfy(q, ether.source, this->soliciter->agentMAC);
 
 		if(ether.destination.isBroadcast()){
-			return p;
+			output(1).push(p);
+			return;
 		}
 
 		p->kill();
-		return q;
+		output(1).push(q);
 	}else{
-		return p;
+		output(0).push(p);
 	}
 };
 

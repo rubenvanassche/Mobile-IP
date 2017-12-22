@@ -25,7 +25,7 @@ class EthernetAddress{
       std::stringstream out;
 
       for(int i = 0;i < 6;i++){
-        out << std::to_string(this->eth[i]);
+        out << std::hex << (int)this->eth[i];
 
         if(i != 5){
           out << " - ";

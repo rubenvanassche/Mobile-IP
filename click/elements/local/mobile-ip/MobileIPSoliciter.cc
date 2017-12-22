@@ -97,7 +97,6 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 	}
 
 	EtherHeader ether = processEtherHeader(p, true);
-		std::cout << ether.destination.s() << std::endl;
 
 	routerAdvertisement adv;
 

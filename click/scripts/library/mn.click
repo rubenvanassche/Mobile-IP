@@ -34,9 +34,11 @@ elementclass MobileNode {
 		-> FixIPSrc($address)
 		-> ttl :: DecIPTTL
 		-> frag :: IPFragmenter(1500)
-		-> arpq :: ARPQuerier($address)
+		-> EtherEncap(0x800, ff:ff:ff:ff:ff:ff, ff:ff:ff:ff:ff:ff)
 		-> ToDump("test.pcap")
+		-> Strip(14)
 		-> miptransformer
+		-> arpq :: ARPQuerier($address)
 		-> output;
 
 	ipgw[1]	-> ICMPError($address, parameterproblem)
@@ -71,5 +73,6 @@ elementclass MobileNode {
 
 	mipclass[2] -> mipsoliciter; // adv with other ip's
 
+	miptransformer[1] -> ToDump("test2.pcap") -> output; // Packets ready to go out when conencted with fA
 
 }
