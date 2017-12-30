@@ -96,6 +96,18 @@ public:
     this->requests.push_back(item);
   }
 
+  bool has(IPAddress destination, IPAddress careOfAddress){
+    for(auto it = this->requests.begin();it != this->requests.end();){
+      if(it->destination == destination and it->careOfAddress == careOfAddress ){
+        return true;
+      }else{
+        it++;
+      }
+    }
+
+    return false;
+  }
+
   RequestListItem getLastRequest(){
     return this->requests.back();
   }
