@@ -163,8 +163,10 @@ void MobileIPNode::processReply(registrationReply reply){
 
 	if(reply.code == 136){
 			click_chatter("Reply 136 : HA Unkown Home Agent Address");
-			// TODO: resend registration
-			// TODO set home agent field to the correct one
+			this->homeAgentPublicAddress = reply.homeAgent;
+			if(this->connection.isHome == true){
+				this->registerFA(reply.IP.source, request.careOfAddress, reply.lifetime);
+			}
 			return;
 	}
 }

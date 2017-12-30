@@ -55,7 +55,7 @@ elementclass Agent {
 	input[1]
 		-> HostEtherFilter($public_address)
 		-> public_class :: Classifier(12/0806 20/0001, 12/0806 20/0002, 12/0800)
-		-> ARPResponder($public_address)
+		-> ARPResponder($public_address:ipnet $public_address:eth)
 		-> [1]output;
 
 	public_arpq :: ARPQuerier($public_address)

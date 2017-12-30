@@ -85,6 +85,7 @@ void MobileIPForeignAgent::push(int port, Packet *p) {
 			return;
 		}
 
+
 		this->relayReply(reply);
 	}
 

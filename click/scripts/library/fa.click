@@ -136,7 +136,7 @@ elementclass Agent {
 
 		// This is a home agent so act like one
 		mipagent[0] -> private_arpq;
-		mipagent[1] -> public_arpq;
+		mipagent[1]	-> public_arpq;
 
 		// Registration requests
 		private_mipclass[1] -> [0]mipagent;

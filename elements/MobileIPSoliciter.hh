@@ -70,7 +70,6 @@ class MobileIPSoliciter : public Element {
 		// Adress of agent connected with
 		IPAddress agentAddress;
 
-
 		// Checks if this is the first time connecting, if so do not register with HA
 		bool firstConnection = true;
 

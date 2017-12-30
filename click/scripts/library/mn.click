@@ -16,6 +16,8 @@ elementclass MobileNode {
 	$address, $gateway, $home_agent |
 
 	// Mobile IP
+	// Home Agent unkown
+	// mipnode :: MobileIPNode(HOME_ADDRESS $address:ip, HA_PRIVATE_ADDRESS $gateway:ip, HA_PUBLIC_ADDRESS 192.168.0.255);
 	mipnode :: MobileIPNode(HOME_ADDRESS $address:ip, HA_PRIVATE_ADDRESS $gateway:ip, HA_PUBLIC_ADDRESS $home_agent:ip);
 	mipsoliciter :: MobileIPSoliciter(LINK_ADDRESS $address:ip, MN mipnode);
 	miptransformer :: MobileIPPacketTransformer(mipsoliciter);
@@ -34,9 +36,6 @@ elementclass MobileNode {
 		-> FixIPSrc($address)
 		-> ttl :: DecIPTTL
 		-> frag :: IPFragmenter(1500)
-		-> EtherEncap(0x800, ff:ff:ff:ff:ff:ff, ff:ff:ff:ff:ff:ff)
-		-> ToDump("test.pcap")
-		-> Strip(14)
 		-> miptransformer
 		-> arpq :: ARPQuerier($address)
 		-> output;
@@ -73,6 +72,6 @@ elementclass MobileNode {
 
 	mipclass[2] -> mipsoliciter; // adv with other ip's
 
-	miptransformer[1] -> ToDump("test2.pcap") -> output; // Packets ready to go out when conencted with fA
+	miptransformer[1] -> output; // Packets ready to go out when conencted with fA
 
 }
