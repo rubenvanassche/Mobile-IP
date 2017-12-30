@@ -144,4 +144,3 @@ TODO:
   - Bij eigen FA en HA -> bij switch van FA terug naar HA: soms wordt er geen request naar HA gestuurd en dus loopt alles mis -> adv worden bij referentie FA altijd naar 255.255.255.255 gestuurd, effect?
 - Eventueel in FA visitorlist en requestlist mergen(zie 3.7 en  3.6.1.1 en 3.6.2.3)
 - Documentatie schrijven
-- Testen van FA handers
