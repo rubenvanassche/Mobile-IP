@@ -142,11 +142,6 @@ Author’s Address ...................................................
 TODO:
 - checken met reference !!!!!!!
   - Bij eigen FA en HA -> bij switch van FA terug naar HA: soms wordt er geen request naar HA gestuurd en dus loopt alles mis -> adv worden bij referentie FA altijd naar 255.255.255.255 gestuurd, effect?
-- Wat als home agent ongekend
 - Eventueel in FA visitorlist en requestlist mergen(zie 3.7 en  3.6.1.1 en 3.6.2.3)
 - Documentatie schrijven
-- Testen met scenario's(tevens deze opstellen), toe te voegen
-  - registration timeout
-  - max pending Requests
-  - home agent ongekend
-  - Wat met verkeerde lengte van Solicitation
+- Testen van FA handers

@@ -139,7 +139,7 @@ Packet *MobileIPSoliciter::simple_action(Packet *p) {
 		if((adv.sequenceNumber - 1) != this->advertisementSequenceNumber and adv.sequenceNumber < 256){
 			// agent resetted itself
 			std::cout << "Agent resetted itself" << std::endl;
-			this->MN->reregister(adv.IP.source, adv.careOfAddress, adv.lifetime);
+			this->MN->reregister(adv.IP.source, adv.careOfAddress, adv.registrationLifetime);
 			this->advertisementSequenceNumber = adv.sequenceNumber;
 		}else{
 			this->advertisementSequenceNumber++;
@@ -171,7 +171,7 @@ void MobileIPSoliciter::connect(routerAdvertisement advertisement, EtherHeader e
 	this->agentMAC = ether.source;
 
 	if(requestRegistration == true){
-		this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.lifetime);
+		this->MN->reregister(advertisement.IP.source, advertisement.careOfAddress, advertisement.registrationLifetime);
 	}
 }
 

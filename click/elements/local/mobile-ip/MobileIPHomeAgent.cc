@@ -155,8 +155,6 @@ bool MobileIPHomeAgent::checkForUnkwownHomeAgent(registrationRequest registratio
 }
 
 bool MobileIPHomeAgent::checkRegistrationValidity(registrationRequest registration, unsigned int port){
-		// TODO check if send subnet-directed broadcast address and reply p61
-
 		// Check if resuest was recieved on correct port
 		if(registration.UDP.destinationPort != 434){
 			click_chatter("Reply send to wrong port!");

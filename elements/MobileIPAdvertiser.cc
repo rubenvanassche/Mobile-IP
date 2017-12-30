@@ -33,6 +33,7 @@ int MobileIPAdvertiser::initialize(ErrorHandler *) {
 
 void MobileIPAdvertiser::add_handlers(){
 		add_write_handler("set_lifetime", &changeLifetimeHandler, (void *)0);
+		add_data_handlers("set_registration_lifetime", Handler::OP_READ | Handler::OP_WRITE, &registrationLifetime);
 }
 
 
@@ -40,7 +41,7 @@ int MobileIPAdvertiser::changeLifetimeHandler(const String &conf, Element *e, vo
 		MobileIPAdvertiser* me = (MobileIPAdvertiser*) e;
 
 		int seconds;
-		if(Args(errh).push_back_args(conf).read("SECONDS", seconds).complete() < 0){
+		if(Args(errh).push_back_args(conf).read_p("SECONDS", seconds).complete() < 0){
 				return -1;
 		}
 

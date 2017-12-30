@@ -14,7 +14,6 @@ Alles wat zowat kan misgaan getest
 - Indien reply naar verkeerde port wordt gestuurd -> pakket wordt genegeerd, melding getoond
 - Indien een registration met te hoge lifetime toekomt -> reply bevat aangepaste lifetime
 
-
 ## Foreign Agent
 - Checksums worden gecheckt -> pakket wordt genegeerd, melding getoond
 - Indien reply naar verkeerde port wordt gestuurd -> pakket wordt genegeerd, melding getoond
@@ -29,3 +28,5 @@ Alles wat zowat kan misgaan getest
 - Indien Reply met ongekend identification aankomt -> pakket wordt genegeerd, melding getoond
 - Bij een UDP checksum van 0 worden pakketten toch bekeken
 - Indien error 69 toekomt(te hoge lifetime gevraagd) -> MN stuurt nieuw request met lagere lifetime
+- Indien een FA of HA zichzelf reset wordt er opnieuw geregistreerd
+- Indien Home Agent ongekend en als Home Agent het subnetted broadcast address wordt gebruikt 192.168.0.255 zal een juiste afhandling gebeuren
