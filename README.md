@@ -1,5 +1,5 @@
 # Mobile-IP
-A project for Telecom at the University Of Antwerp
+Een project voor Telecom op de Universiteit Antwerpen
 
 ## Compileren
 ```
